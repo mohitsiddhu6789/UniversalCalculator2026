@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- Preconnect to external domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+    
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    
+    <!-- Structured Data - Organization -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Universal",
+      "url": "https://universalemi.com",
+      "description": "Free online EMI and loan calculator",
+      "logo": "https://universalemi.com/logo.png",
+      "sameAs": [
+        "https://www.facebook.com/universalemi",
+        "https://twitter.com/universalemi",
+        "https://www.linkedin.com/company/universalemi"
+      ],
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "Customer Service",
+        "url": "https://universalemi.com/contact"
+      }
+    }
+    </script>
+
+    <!-- Structured Data - FAQPage -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "What is EMI?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "EMI (Equated Monthly Installment) is the fixed amount you pay monthly to repay your loan including principal and interest."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "How is EMI calculated?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "EMI is calculated using the formula: EMI = [P x R x (1+R)^N]/[(1+R)^N-1], where P is principal, R is monthly rate, and N is number of months."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What is part payment?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Part payment (prepayment) is when you pay a lump sum amount towards your loan before the maturity date, which reduces interest and tenure."
+          }
+        }
+      ]
+    }
+    </script>
+
+    <title>Universal - Free EMI & Loan Calculator</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
