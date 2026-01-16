@@ -1,13 +1,17 @@
+# Build configuration
 [build]
   command = "npm run build"
-  functions = "netlify/functions"
   publish = "dist"
+  functions = "netlify/functions"
 
-[dev]
-  command = "npm run dev"
-  port = 3000
+# Environment variables
+[env]
+  [env.production]
+    NODE_ENV = "production"
+  [env.development]
+    NODE_ENV = "development"
 
-# Headers for SEO and Performance
+# Headers for security
 [[headers]]
   for = "/*"
   [headers.values]
@@ -15,32 +19,15 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
 
-# Cache headers for static assets
-[[headers]]
-  for = "/assets/*"
-  [headers.values]
-    Cache-Control = "public, max-age=31536000, immutable"
-
-# Cache headers for HTML
-[[headers]]
-  for = "/*.html"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"
-
-# Redirect rules
+# Redirect rules (SPA routing)
 [[redirects]]
-  from = "/.netlify/functions/:name"
-  to = "/.netlify/functions/:name"
+  from = "/*"
+  to = "/index.html"
   status = 200
 
+# API function redirects (if needed)
 [[redirects]]
-  from = "/sitemap.xml"
-  to = "/sitemap.xml"
-  status = 200
-
-[[redirects]]
-  from = "/robots.txt"
-  to = "/robots.txt"
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
   status = 200
