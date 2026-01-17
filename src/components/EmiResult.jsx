@@ -33,60 +33,57 @@ export default function EmiResult({ result }) {
     }
   };
 
+  if (!result) {
+    return null;
+  }
+
   return (
     <div className="space-y-6">
-      {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <p className="text-slate-600 text-sm font-medium mb-2">Monthly EMI</p>
-          <p className="text-4xl font-bold text-blue-600">₹{result.emi.toLocaleString('en-IN')}</p>
-        </div>
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <p className="text-slate-600 text-sm font-medium mb-2">Total Interest</p>
-          <p className="text-4xl font-bold text-orange-600">
-            ₹{result.totalInterest.toLocaleString('en-IN')}
-          </p>
-        </div>
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <p className="text-slate-600 text-sm font-medium mb-2">Total Payment</p>
-          <p className="text-2xl font-bold text-slate-900">
-            ₹{result.totalPayment.toLocaleString('en-IN')}
-          </p>
-        </div>
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <p className="text-slate-600 text-sm font-medium mb-2">Tenure</p>
-          <p className="text-2xl font-bold text-slate-900">
-            {Math.floor(result.tenure / 12)}Y {result.tenure % 12}M
-          </p>
-        </div>
-      </div>
-
-      {/* Detailed Breakdown */}
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-xl font-bold text-slate-900 mb-4">Loan Summary</h3>
+        <h3 className="text-2xl font-bold text-slate-900 mb-6">📊 Calculation Results</h3>
+
+        {/* Main EMI Card */}
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
+          <p className="text-sm font-semibold text-blue-700 uppercase mb-2">Monthly EMI</p>
+          <p className="text-4xl font-bold text-blue-900">
+            ₹{Math.round(result.emi).toLocaleString('en-IN')}
+          </p>
+        </div>
+
+        {/* Results Grid */}
         <div className="grid grid-cols-2 gap-4">
-          <div>
-            <p className="text-slate-600 text-sm">Loan Amount</p>
-            <p className="text-lg font-semibold text-slate-900">
+          <div className="bg-slate-50 p-4 rounded-lg border-l-4 border-green-500">
+            <p className="text-xs font-semibold text-slate-600 uppercase mb-2">Principal Amount</p>
+            <p className="text-2xl font-bold text-slate-900">
               ₹{result.principal.toLocaleString('en-IN')}
             </p>
           </div>
-          <div>
-            <p className="text-slate-600 text-sm">Interest Rate</p>
-            <p className="text-lg font-semibold text-slate-900">{result.interestRate}% p.a.</p>
-          </div>
-          <div>
-            <p className="text-slate-600 text-sm">Interest Amount</p>
-            <p className="text-lg font-semibold text-orange-600">
-              ₹{result.totalInterest.toLocaleString('en-IN')}
+
+          <div className="bg-slate-50 p-4 rounded-lg border-l-4 border-orange-500">
+            <p className="text-xs font-semibold text-slate-600 uppercase mb-2">Total Interest</p>
+            <p className="text-2xl font-bold text-orange-600">
+              ₹{Math.round(result.totalInterest).toLocaleString('en-IN')}
             </p>
           </div>
-          <div>
-            <p className="text-slate-600 text-sm">Total Payable</p>
-            <p className="text-lg font-semibold text-slate-900">
-              ₹{result.totalPayment.toLocaleString('en-IN')}
+
+          <div className="bg-slate-50 p-4 rounded-lg border-l-4 border-purple-500">
+            <p className="text-xs font-semibold text-slate-600 uppercase mb-2">Total Payment</p>
+            <p className="text-2xl font-bold text-purple-600">
+              ₹{Math.round(result.totalPayment).toLocaleString('en-IN')}
             </p>
           </div>
+
+          <div className="bg-slate-50 p-4 rounded-lg border-l-4 border-cyan-500">
+            <p className="text-xs font-semibold text-slate-600 uppercase mb-2">Tenure</p>
+            <p className="text-2xl font-bold text-cyan-600">{result.tenure} months</p>
+          </div>
+        </div>
+
+        {/* Loan Type */}
+        <div className="mt-4 p-3 bg-slate-100 rounded-lg">
+          <p className="text-sm text-slate-700">
+            <strong>Loan Type:</strong> {result.loanType}
+          </p>
         </div>
       </div>
 
@@ -95,13 +92,13 @@ export default function EmiResult({ result }) {
 
       {/* Action Buttons */}
       <div className="flex gap-3">
-        <button
+        {/*<button
           onClick={handleSave}
           disabled={saving}
           className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-400 text-white font-bold py-3 rounded-lg transition duration-200"
         >
           {saving ? 'Saving...' : '💾 Save Calculation'}
-        </button>
+        </button>*/}
         {/*<button
           onClick={() => setShowPartPayment(!showPartPayment)}
           className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 rounded-lg transition duration-200"

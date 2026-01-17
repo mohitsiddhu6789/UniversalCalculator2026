@@ -1,156 +1,153 @@
+import * as supabaseApi from './supabaseApi';
+
+const USE_SUPABASE = import.meta.env.VITE_SUPABASE_URL ? true : false;
+
 /**
- * API Service for frontend calls to Netlify Functions
+ * API Service for EMI Calculator
+ * Handles all API calls to save and retrieve calculations
  */
 
-const API_URL = import.meta.env.VITE_API_URL || '/.netlify/functions';
+/**
+ * Save EMI calculation to backend
+ * @param {Object} calculationData - The calculation data to save
+ * @returns {Promise} Response from the server
+ */
+export const saveCalculation = async (calculationData) => {
+  if (USE_SUPABASE) {
+    return await supabaseApi.saveEmiCalculation(calculationData);
+  } else {
+    // Fallback to localStorage
+    return saveCalculationLocal(calculationData);
+  }
+};
 
-export const saveCalculation = async (data) => {
+/**
+ * Get all calculations for a user
+ * @param {string} email - User email
+ * @returns {Promise} Array of calculations
+ */
+export const getCalculations = async (email) => {
+  if (USE_SUPABASE) {
+    return await supabaseApi.getUserEmiCalculations(email);
+  } else {
+    return getCalculationsLocal(email);
+  }
+};
+
+/**
+ * Get all calculations (for admin)
+ * @returns {Promise} Array of all calculations
+ */
+export const getAllCalculations = async () => {
+  if (USE_SUPABASE) {
+    return await supabaseApi.getAllEmiCalculations();
+  } else {
+    return getAllCalculationsLocal();
+  }
+};
+
+/**
+ * Delete a calculation
+ * @param {number} calculationId - ID of calculation to delete
+ * @returns {Promise} Success status
+ */
+export const deleteCalculation = async (calculationId) => {
+  if (USE_SUPABASE) {
+    return await supabaseApi.deleteEmiCalculation(calculationId);
+  } else {
+    return deleteCalculationLocal(calculationId);
+  }
+};
+
+/**
+ * Export calculations as CSV
+ * @param {Array} calculations - Array of calculations to export
+ * @returns {string} CSV content
+ */
+export const exportAsCSV = (calculations) => {
+  return supabaseApi.exportCalculationsAsCSV(calculations);
+};
+
+/**
+ * Download CSV file
+ * @param {string} csvContent - CSV content
+ * @param {string} fileName - Name of file to download
+ */
+export const downloadCSV = (csvContent, fileName) => {
+  return supabaseApi.downloadCSV(csvContent, fileName);
+};
+
+// ...existing localStorage functions...
+function saveCalculationLocal(calculationData) {
   try {
-    const response = await fetch(`${API_URL}/saveCalculation`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+    const existingCalculations = JSON.parse(localStorage.getItem('emiCalculations')) || [];
+    const newCalculation = {
+      id: Date.now(),
+      ...calculationData,
+      savedAt: new Date().toISOString(),
+    };
+    existingCalculations.push(newCalculation);
+    localStorage.setItem('emiCalculations', JSON.stringify(existingCalculations));
+    return {
+      success: true,
+      message: '✅ Calculation saved successfully!',
+      data: newCalculation,
+    };
   } catch (error) {
-    console.error('Error saving calculation:', error);
-    throw error;
+    return {
+      success: false,
+      message: '❌ Failed to save calculation',
+      error: error.message,
+    };
   }
-};
+}
 
-export const savePartPaymentEmail = async (email, partPaymentData) => {
+function getCalculationsLocal(email) {
   try {
-    const response = await fetch(`${API_URL}/savePartPaymentEmail`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, partPaymentData }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+    const allCalculations = JSON.parse(localStorage.getItem('emiCalculations')) || [];
+    const userCalculations = allCalculations.filter(calc => calc.email === email);
+    return {
+      success: true,
+      data: userCalculations,
+    };
   } catch (error) {
-    console.error('Error saving part payment email:', error);
-    throw error;
+    return {
+      success: false,
+      error: error.message,
+      data: [],
+    };
   }
-};
+}
 
-export const getCalculations = async (email = null, loanType = null) => {
+function getAllCalculationsLocal() {
   try {
-    let url = `${API_URL}/getCalculations`;
-    const params = new URLSearchParams();
-
-    if (email) params.append('email', email);
-    if (loanType) params.append('loanType', loanType);
-
-    if (params.toString()) {
-      url += `?${params.toString()}`;
-    }
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+    const allCalculations = JSON.parse(localStorage.getItem('emiCalculations')) || [];
+    return {
+      success: true,
+      data: allCalculations,
+    };
   } catch (error) {
-    console.error('Error fetching calculations:', error);
-    throw error;
+    return {
+      success: false,
+      error: error.message,
+      data: [],
+    };
   }
-};
+}
 
-// Alias for Admin page compatibility
-export const getAllCalculations = getCalculations;
-
-export const deleteCalculation = async (id) => {
+function deleteCalculationLocal(calculationId) {
   try {
-    const response = await fetch(`${API_URL}/deleteCalculation`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ id }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    return await response.json();
+    const allCalculations = JSON.parse(localStorage.getItem('emiCalculations')) || [];
+    const filtered = allCalculations.filter(calc => calc.id !== calculationId);
+    localStorage.setItem('emiCalculations', JSON.stringify(filtered));
+    return {
+      success: true,
+      message: 'Calculation deleted successfully',
+    };
   } catch (error) {
-    console.error('Error deleting calculation:', error);
-    throw error;
+    return {
+      success: false,
+      error: error.message,
+    };
   }
-};
-
-export const exportAsCSV = (data) => {
-  if (!data || data.length === 0) {
-    console.warn('No data to export');
-    return null;
-  }
-
-  const headers = [
-    'Email',
-    'Loan Type',
-    'Principal',
-    'Interest Rate',
-    'Tenure (Months)',
-    'EMI',
-    'Total Interest',
-    'Total Payment',
-    'Created At',
-  ];
-
-  const rows = data.map((item) => [
-    item.email,
-    item.loan_type,
-    item.principal,
-    item.interest_rate,
-    item.tenure_months,
-    item.emi,
-    item.total_interest,
-    item.total_payment,
-    new Date(item.created_at).toLocaleDateString(),
-  ]);
-
-  const csvContent = [
-    headers.join(','),
-    ...rows.map((row) => row.map((cell) => `"${cell}"`).join(',')),
-  ].join('\n');
-
-  return csvContent;
-};
-
-export const downloadCSV = (data, filename = 'calculations.csv') => {
-  const csvContent = exportAsCSV(data);
-
-  if (!csvContent) return;
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-
-  link.setAttribute('href', url);
-  link.setAttribute('download', filename);
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+}

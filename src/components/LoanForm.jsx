@@ -1,260 +1,310 @@
 import React, { useState } from 'react';
-import { calculateEMI, generateEmiSchedule, validateLoanInput } from '../utils/emiCalculator';
-import { LOAN_TYPES, validateAgainstRules } from '../utils/loanRules';
-import EmiResult from './EmiResult';
-import EmiTable from './EmiTable';
+import { validateLoanInput } from '../utils/emiCalculator';
 
-export default function LoanForm({ onNavigate }) {
+const LOAN_TYPES = [
+  { value: 'Personal Loan', label: '👤 Personal Loan' },
+  { value: 'Home Loan', label: '🏠 Home Loan' },
+  { value: 'Auto Loan', label: '🚗 Auto Loan' },
+  { value: 'Education Loan', label: '🎓 Education Loan' },
+  { value: 'Business Loan', label: '💼 Business Loan' },
+];
+
+const EMI_TYPES = [
+  { value: 'reducing', label: '📉 Reducing Balance', description: 'Interest calculated on remaining balance (Most Common)' },
+  { value: 'flat', label: '📊 Flat Rate', description: 'Interest calculated on principal throughout tenure' },
+];
+
+export default function LoanForm({ onCalculate, isLoading = false }) {
   const [formData, setFormData] = useState({
     email: '',
-    loanType: LOAN_TYPES.PERSONAL,
+    loanType: 'Personal Loan',
+    emiType: 'reducing',
     principal: '',
     interestRate: '',
     tenure: '',
-    tenureType: 'months', // 'months' or 'years'
   });
+  const [errors, setErrors] = useState({});
 
-  const [result, setResult] = useState(null);
-  const [errors, setErrors] = useState([]);
-  const [loading, setLoading] = useState(false);
-
-  const handleInputChange = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value,
     }));
+    // Clear error for this field when user starts typing
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: '',
+      }));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePrincipal = (principal) => {
+    // Check if empty
+    if (!principal || principal.trim() === '') {
+      return 'Principal amount is required';
+    }
+
+    const principalNum = parseFloat(principal);
+
+    // Check if valid number
+    if (isNaN(principalNum)) {
+      return 'Principal amount must be a valid number';
+    }
+
+    // Check if positive
+    if (principalNum <= 0) {
+      return 'Principal amount must be a positive number';
+    }
+
+    return '';
+  };
+
+  const validateInterestRate = (rate) => {
+    if (!rate && rate !== 0) {
+      return 'Interest rate is required';
+    }
+
+    const rateNum = parseFloat(rate);
+
+    if (isNaN(rateNum)) {
+      return 'Interest rate must be a valid number';
+    }
+
+    if (rateNum < 0) {
+      return 'Interest rate cannot be negative';
+    }
+
+    return '';
+  };
+
+  const validateTenure = (tenure) => {
+    if (!tenure) {
+      return 'Tenure is required';
+    }
+
+    const tenureNum = parseInt(tenure);
+
+    if (isNaN(tenureNum)) {
+      return 'Tenure must be a valid number';
+    }
+
+    if (tenureNum <= 0) {
+      return 'Tenure must be greater than 0';
+    }
+
+    return '';
+  };
+
+  const handleCalculate = (e) => {
     e.preventDefault();
-    setErrors([]);
-    setLoading(true);
+
+    const newErrors = {};
 
     // Validate email
-    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setErrors(['Please enter a valid email address']);
-      setLoading(false);
-      return;
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email address is required';
+    } else if (!validateEmail(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
     }
 
-    // Convert tenure to months if in years
-    const tenureMonths =
-      formData.tenureType === 'years'
-        ? parseInt(formData.tenure) * 12
-        : parseInt(formData.tenure);
-
-    const principal = parseFloat(formData.principal);
-    const interestRate = parseFloat(formData.interestRate);
-
-    // Validate input
-    const validation = validateLoanInput({
-      principal,
-      interestRate,
-      tenure: tenureMonths,
-    });
-
-    if (!validation.isValid) {
-      setErrors(validation.errors);
-      setLoading(false);
-      return;
+    // Validate principal
+    const principalError = validatePrincipal(formData.principal);
+    if (principalError) {
+      newErrors.principal = principalError;
     }
 
-    // Validate against loan rules
-    const ruleValidation = validateAgainstRules(
-      formData.loanType,
-      principal,
-      interestRate,
-      tenureMonths
-    );
-
-    if (!ruleValidation.isValid) {
-      setErrors(ruleValidation.errors);
-      setLoading(false);
-      return;
+    // Validate interest rate
+    const rateError = validateInterestRate(formData.interestRate);
+    if (rateError) {
+      newErrors.interestRate = rateError;
     }
 
-    // Calculate EMI
-    const emi = calculateEMI(principal, interestRate, tenureMonths);
-    const schedule = generateEmiSchedule(principal, interestRate, tenureMonths);
-    const totalInterest = emi * tenureMonths - principal;
-    const totalPayment = principal + totalInterest;
+    // Validate tenure
+    const tenureError = validateTenure(formData.tenure);
+    if (tenureError) {
+      newErrors.tenure = tenureError;
+    }
 
-    setResult({
-      email: formData.email,
-      loanType: formData.loanType,
-      principal,
-      interestRate,
-      tenure: tenureMonths,
-      emi: Math.round(emi * 100) / 100,
-      totalInterest: Math.round(totalInterest * 100) / 100,
-      totalPayment: Math.round(totalPayment * 100) / 100,
-      schedule,
-    });
+    setErrors(newErrors);
 
-    setLoading(false);
+    // If no errors, proceed with calculation
+    if (Object.keys(newErrors).length === 0) {
+      onCalculate({
+        email: formData.email.trim(),
+        principal: parseFloat(formData.principal),
+        interestRate: parseFloat(formData.interestRate),
+        tenure: parseInt(formData.tenure),
+        loanType: formData.loanType,
+        emiType: formData.emiType,
+      });
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-          {/* Form Section */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-lg shadow-xl p-8">
-              <h1 className="text-3xl font-bold text-slate-900 mb-2">Loan EMI</h1>
-              <p className="text-slate-600 mb-8">Calculate your monthly installment</p>
+    <div className="bg-white rounded-lg shadow-lg p-6">
+      <h3 className="text-2xl font-bold text-slate-900 mb-6">💳 Loan Details</h3>
 
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Email Field */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Email Address *
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="your@email.com"
-                    required
-                  />
-                </div>
-
-                {/* Loan Type */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Loan Type *
-                  </label>
-                  <select
-                    name="loanType"
-                    value={formData.loanType}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  >
-                    <option value={LOAN_TYPES.PERSONAL}>Personal Loan</option>
-                    <option value={LOAN_TYPES.HOME}>Home Loan</option>
-                    <option value={LOAN_TYPES.CAR}>Car Loan</option>
-                    <option value={LOAN_TYPES.EDUCATION}>Education Loan</option>
-                    <option value={LOAN_TYPES.BUSINESS}>Business Loan</option>
-                    <option value={LOAN_TYPES.OVERDRAFT}>Overdraft (OD)</option>
-                    <option value={LOAN_TYPES.CUSTOM}>Custom Loan</option>
-                  </select>
-                </div>
-
-                {/* Principal Amount */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Loan Amount (₹) *
-                  </label>
-                  <input
-                    type="number"
-                    name="principal"
-                    value={formData.principal}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="1,00,000"
-                    required
-                  />
-                </div>
-
-                {/* Interest Rate */}
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">
-                    Annual Interest Rate (%) *
-                  </label>
-                  <input
-                    type="number"
-                    name="interestRate"
-                    value={formData.interestRate}
-                    onChange={handleInputChange}
-                    step="0.01"
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="10.5"
-                    required
-                  />
-                </div>
-
-                {/* Tenure */}
-                <div className="grid grid-cols-3 gap-3">
-                  <div className="col-span-2">
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Tenure *
-                    </label>
-                    <input
-                      type="number"
-                      name="tenure"
-                      value={formData.tenure}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="60"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Type
-                    </label>
-                    <select
-                      name="tenureType"
-                      value={formData.tenureType}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    >
-                      <option value="months">Months</option>
-                      <option value="years">Years</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Error Messages */}
-                {errors.length > 0 && (
-                  <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                    {errors.map((error, index) => (
-                      <p key={index} className="text-sm text-red-700">
-                        • {error}
-                      </p>
-                    ))}
-                  </div>
-                )}
-
-                {/* Submit Button */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white font-bold py-3 rounded-lg transition duration-200"
-                >
-                  {loading ? 'Calculating...' : 'Calculate EMI'}
-                </button>
-              </form>
-            </div>
-          </div>
-
-          {/* Results Section */}
-          {result && (
-            <div className="lg:col-span-3">
-              <EmiResult result={result} />
-              <EmiTable schedule={result.schedule} />
-              
-              {/* Part Payment Calculator Link */}
-              {onNavigate && (
-                <div className="mt-8 bg-gradient-to-r from-orange-50 to-orange-100 border-2 border-orange-300 rounded-lg p-6 text-center">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">💰 Want to Reduce Your Interest?</h3>
-                  <p className="text-slate-700 mb-4">
-                    Use our Part Payment Calculator to analyze how prepayment can save you money with your current loan
-                  </p>
-                  <button
-                    onClick={() => onNavigate('part-payment')}
-                    className="bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200"
-                  >
-                    📊 Go to Part Payment Calculator
-                  </button>
-                </div>
-              )}
-            </div>
+      <form onSubmit={handleCalculate} className="space-y-4">
+        {/* Email Address */}
+        <div>
+          <label className="block text-sm font-semibold text-slate-900 mb-2">
+            Email Address <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="your.email@example.com"
+            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder-slate-400 ${
+              errors.email ? 'border-red-500' : 'border-slate-300'
+            }`}
+          />
+          {errors.email && (
+            <p className="text-sm text-red-600 mt-1">❌ {errors.email}</p>
           )}
+          <p className="text-xs text-slate-500 mt-1">We'll use this to save your calculations</p>
         </div>
+
+        {/* Loan Type */}
+        <div>
+          <label className="block text-sm font-semibold text-slate-900 mb-2">
+            Loan Type
+          </label>
+          <select
+            name="loanType"
+            value={formData.loanType}
+            onChange={handleChange}
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-slate-900"
+          >
+            {LOAN_TYPES.map(type => (
+              <option key={type.value} value={type.value}>
+                {type.label}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {/* EMI Type */}
+        <div>
+          <label className="block text-sm font-semibold text-slate-900 mb-3">
+            EMI Calculation Type
+          </label>
+          <div className="space-y-2">
+            {EMI_TYPES.map(type => (
+              <label key={type.value} className="flex items-start cursor-pointer p-3 border-2 border-slate-200 rounded-lg hover:bg-blue-50 hover:border-blue-300 transition duration-150">
+                <input
+                  type="radio"
+                  name="emiType"
+                  value={type.value}
+                  checked={formData.emiType === type.value}
+                  onChange={handleChange}
+                  className="mt-1 w-4 h-4 text-blue-600"
+                />
+                <div className="ml-3 flex-1">
+                  <p className="font-semibold text-slate-900">{type.label}</p>
+                  <p className="text-xs text-slate-600">{type.description}</p>
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Principal Amount - SIMPLIFIED VALIDATION */}
+        <div>
+          <label className="block text-sm font-semibold text-slate-900 mb-2">
+            Principal Amount (₹) <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            name="principal"
+            value={formData.principal}
+            onChange={handleChange}
+            placeholder="500000"
+            step="0.01"
+            min="0"
+            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder-slate-400 ${
+              errors.principal ? 'border-red-500' : 'border-slate-300'
+            }`}
+          />
+          {errors.principal && (
+            <p className="text-sm text-red-600 mt-1">❌ {errors.principal}</p>
+          )}
+          <p className="text-xs text-slate-500 mt-1">Enter any loan amount</p>
+        </div>
+
+        {/* Interest Rate */}
+        <div>
+          <label className="block text-sm font-semibold text-slate-900 mb-2">
+            Annual Interest Rate (%) <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            name="interestRate"
+            value={formData.interestRate}
+            onChange={handleChange}
+            placeholder="10"
+            step="0.01"
+            min="0"
+            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder-slate-400 ${
+              errors.interestRate ? 'border-red-500' : 'border-slate-300'
+            }`}
+          />
+          {errors.interestRate && (
+            <p className="text-sm text-red-600 mt-1">❌ {errors.interestRate}</p>
+          )}
+          <p className="text-xs text-slate-500 mt-1">Example: 10, 10.5, 12.75</p>
+        </div>
+
+        {/* Tenure */}
+        <div>
+          <label className="block text-sm font-semibold text-slate-900 mb-2">
+            Tenure (Months) <span className="text-red-600">*</span>
+          </label>
+          <input
+            type="number"
+            name="tenure"
+            value={formData.tenure}
+            onChange={handleChange}
+            placeholder="60"
+            min="1"
+            step="1"
+            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder-slate-400 ${
+              errors.tenure ? 'border-red-500' : 'border-slate-300'
+            }`}
+          />
+          {errors.tenure && (
+            <p className="text-sm text-red-600 mt-1">❌ {errors.tenure}</p>
+          )}
+          <p className="text-xs text-slate-500 mt-1">Loan duration in months</p>
+        </div>
+
+        {/* Calculate Button */}
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`w-full font-bold py-3 px-4 rounded-lg transition duration-200 shadow-md mt-6 ${
+            isLoading
+              ? 'bg-slate-400 text-slate-600 cursor-not-allowed'
+              : 'bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white'
+          }`}
+        >
+          {isLoading ? '⏳ Calculating...' : '🧮 Calculate EMI'}
+        </button>
+      </form>
+
+      {/* Info Box */}
+      <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+        <p className="text-sm text-blue-900">
+          <strong>💡 Tip:</strong> The EMI calculator uses the standard formula to compute your monthly installment based on principal, interest rate, and tenure.
+        </p>
       </div>
     </div>
   );

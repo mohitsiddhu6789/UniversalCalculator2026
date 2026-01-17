@@ -1,12 +1,20 @@
+# Allow all search engines
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /.netlify
+Disallow: *.env
+Disallow: *.json
 
-Sitemap: https://openloancalc.com/sitemap.xml
-
+# Specific rules for Google
 User-agent: Googlebot
 Allow: /
 
+# Specific rules for Bing
 User-agent: Bingbot
 Allow: /
+
+# Sitemap location
+Sitemap: https://universalcalculator.com/sitemap.xml
+
+# Crawl delay
+Crawl-delay: 1

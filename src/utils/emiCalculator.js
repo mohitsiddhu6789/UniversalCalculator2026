@@ -4,7 +4,7 @@
  */
 
 /**
- * Calculate EMI (Equated Monthly Installment)
+ * Calculate EMI (Equated Monthly Installment) - Reducing Balance Method
  * Formula: EMI = P × R × (1+R)^N / ((1+R)^N − 1)
  * where P = Principal, R = Monthly Interest Rate, N = Number of months
  * 
@@ -31,6 +31,27 @@ export const calculateEMI = (principal, annualRate, months) => {
 };
 
 /**
+ * Calculate EMI - Flat Rate Method
+ * Formula: EMI = (P + (P × R × N)) / N
+ * where P = Principal, R = Annual Rate/100, N = Number of months
+ * 
+ * @param {number} principal - Loan amount
+ * @param {number} annualRate - Annual interest rate (%)
+ * @param {number} months - Tenure in months
+ * @returns {number} Monthly EMI amount
+ */
+export const calculateFlatRateEMI = (principal, annualRate, months) => {
+  if (principal <= 0 || months <= 0 || annualRate < 0) {
+    return 0;
+  }
+
+  const totalInterest = (principal * annualRate * months) / (100 * 12);
+  const emi = (principal + totalInterest) / months;
+
+  return emi;
+};
+
+/**
  * Calculate total interest payable
  * @param {number} emi - Monthly EMI
  * @param {number} months - Tenure in months
@@ -42,7 +63,7 @@ export const calculateTotalInterest = (emi, months, principal) => {
 };
 
 /**
- * Generate EMI schedule table
+ * Generate EMI schedule table - Reducing Balance
  * @param {number} principal - Loan amount
  * @param {number} annualRate - Annual interest rate (%)
  * @param {number} months - Tenure in months
@@ -65,6 +86,36 @@ export const generateEmiSchedule = (principal, annualRate, months) => {
       emi: Math.round(emi * 100) / 100,
       principal: Math.round(principalPayable * 100) / 100,
       interest: Math.round(interestPayable * 100) / 100,
+      balance: Math.max(0, Math.round(balance * 100) / 100),
+    });
+  }
+
+  return schedule;
+};
+
+/**
+ * Generate EMI schedule table - Flat Rate
+ * @param {number} principal - Loan amount
+ * @param {number} annualRate - Annual interest rate (%)
+ * @param {number} months - Tenure in months
+ * @returns {Array} Array of month-wise schedule objects
+ */
+export const generateFlatRateEmiSchedule = (principal, annualRate, months) => {
+  const emi = calculateFlatRateEMI(principal, annualRate, months);
+  const monthlyInterest = (principal * annualRate) / (100 * 12);
+  const monthlyPrincipal = (principal / months);
+  const schedule = [];
+
+  let balance = principal;
+
+  for (let i = 1; i <= months; i++) {
+    balance -= monthlyPrincipal;
+
+    schedule.push({
+      month: i,
+      emi: Math.round(emi * 100) / 100,
+      principal: Math.round(monthlyPrincipal * 100) / 100,
+      interest: Math.round(monthlyInterest * 100) / 100,
       balance: Math.max(0, Math.round(balance * 100) / 100),
     });
   }
@@ -155,35 +206,145 @@ export const calculatePreClosurePenalty = (remainingBalance, penaltyPercent = 2,
 };
 
 /**
- * Validate loan input parameters
+ * Validate loan input parameters - SIMPLIFIED
  * @param {Object} params - Loan parameters
  * @returns {Object} Validation result with errors array
  */
 export const validateLoanInput = (params) => {
   const errors = [];
 
+  // Principal: Required and must be positive
   if (!params.principal || params.principal <= 0) {
-    errors.push('Principal amount must be greater than 0');
+    errors.push('Principal amount must be a positive number');
   }
 
-  if (!params.interestRate || params.interestRate < 0) {
+  // Interest Rate: Required and cannot be negative
+  if (params.interestRate === undefined || params.interestRate === null || params.interestRate < 0) {
     errors.push('Interest rate cannot be negative');
   }
 
+  // Tenure: Required and must be positive
   if (!params.tenure || params.tenure <= 0) {
     errors.push('Tenure must be greater than 0');
-  }
-
-  if (params.principal > 100000000) {
-    errors.push('Principal amount exceeds maximum limit of 100 crore');
-  }
-
-  if (params.interestRate > 50) {
-    errors.push('Interest rate seems unusually high (>50%)');
   }
 
   return {
     isValid: errors.length === 0,
     errors,
   };
+};
+
+/**
+ * Calculate part payment impact with strategy selection
+ * @param {number} principal - Original loan amount
+ * @param {number} annualRate - Annual interest rate (%)
+ * @param {number} months - Total tenure in months
+ * @param {Array} partPayments - Array of {month, amount, chargePercent}
+ * @param {string} strategy - 'emi' | 'tenure' | 'principal'
+ * @returns {Object} Calculation result with comparison
+ */
+export const calculatePartPaymentStrategy = (
+  principal,
+  annualRate,
+  months,
+  partPayments = [],
+  strategy = 'emi'
+) => {
+  if (!partPayments || partPayments.length === 0) {
+    const emi = calculateEMI(principal, annualRate, months);
+    return {
+      strategy,
+      originalEMI: emi,
+      newEMI: emi,
+      originalTenure: months,
+      newTenure: months,
+      originalPrincipal: principal,
+      newPrincipal: principal,
+      totalInterestOriginal: calculateTotalInterest(emi, months, principal),
+      totalInterestNew: calculateTotalInterest(emi, months, principal),
+      interestSaved: 0,
+      totalPartPaymentCharges: 0,
+      totalPartPaymentAmount: 0,
+    };
+  }
+
+  const originalEMI = calculateEMI(principal, annualRate, months);
+  const originalInterest = calculateTotalInterest(originalEMI, months, principal);
+  const monthlyRate = annualRate / 100 / 12;
+
+  let remainingBalance = principal;
+  let totalCharges = 0;
+  let totalPartPaymentAmount = 0;
+
+  // Calculate remaining balance after part payments
+  for (const payment of partPayments) {
+    if (payment.month <= months && payment.amount > 0) {
+      const chargeAmount = (payment.amount * (payment.chargePercent || 0)) / 100;
+      totalCharges += chargeAmount;
+      totalPartPaymentAmount += payment.amount;
+      remainingBalance -= payment.amount;
+    }
+  }
+
+  remainingBalance = Math.max(0, remainingBalance);
+
+  let result = {
+    strategy,
+    originalEMI: Math.round(originalEMI * 100) / 100,
+    originalTenure: months,
+    originalPrincipal: principal,
+    totalInterestOriginal: Math.round(originalInterest * 100) / 100,
+    totalPartPaymentCharges: Math.round(totalCharges * 100) / 100,
+    totalPartPaymentAmount: Math.round(totalPartPaymentAmount * 100) / 100,
+  };
+
+  // Calculate based on strategy
+  if (strategy === 'emi') {
+    // Reduce tenure, keep EMI same
+    const newTenure = remainingBalance > 0 
+      ? Math.ceil(Math.log(originalEMI / (originalEMI - remainingBalance * monthlyRate)) / Math.log(1 + monthlyRate))
+      : 0;
+    const newInterest = remainingBalance > 0 ? calculateTotalInterest(originalEMI, newTenure, remainingBalance) : 0;
+
+    result = {
+      ...result,
+      newEMI: Math.round(originalEMI * 100) / 100,
+      newTenure: Math.max(0, newTenure),
+      newPrincipal: Math.round(remainingBalance * 100) / 100,
+      totalInterestNew: Math.round(Math.max(0, newInterest) * 100) / 100,
+      interestSaved: Math.round((originalInterest - Math.max(0, newInterest) - totalCharges) * 100) / 100,
+      tenureReduction: months - Math.max(0, newTenure),
+    };
+  } else if (strategy === 'tenure') {
+    // Keep tenure same, reduce EMI
+    const newEMI = remainingBalance > 0 ? calculateEMI(remainingBalance, annualRate, months) : 0;
+    const newInterest = remainingBalance > 0 ? calculateTotalInterest(newEMI, months, remainingBalance) : 0;
+
+    result = {
+      ...result,
+      newEMI: Math.round(newEMI * 100) / 100,
+      newTenure: months,
+      newPrincipal: Math.round(remainingBalance * 100) / 100,
+      totalInterestNew: Math.round(newInterest * 100) / 100,
+      interestSaved: Math.round((originalInterest - newInterest - totalCharges) * 100) / 100,
+      emiReduction: Math.round((originalEMI - newEMI) * 100) / 100,
+    };
+  } else if (strategy === 'principal') {
+    // Reduce principal, recalculate EMI and tenure proportionally
+    const newEMI = remainingBalance > 0 ? calculateEMI(remainingBalance, annualRate, months) : 0;
+    const newInterest = remainingBalance > 0 ? calculateTotalInterest(newEMI, months, remainingBalance) : 0;
+
+    result = {
+      ...result,
+      newEMI: Math.round(newEMI * 100) / 100,
+      newTenure: months,
+      newPrincipal: Math.round(remainingBalance * 100) / 100,
+      totalInterestNew: Math.round(newInterest * 100) / 100,
+      interestSaved: Math.round((originalInterest - newInterest - totalCharges) * 100) / 100,
+      principalReduction: Math.round((principal - remainingBalance) * 100) / 100,
+      emiReduction: Math.round((originalEMI - newEMI) * 100) / 100,
+    };
+  }
+
+  return result;
 };

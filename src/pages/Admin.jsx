@@ -1,237 +1,426 @@
 import React, { useState, useEffect } from 'react';
-import { getAllCalculations, deleteCalculation, exportAsCSV, downloadCSV } from '../services/api';
-import PartPaymentEmailTable from '../components/PartPaymentEmailTable';
-import SEO from '../components/SEO';
+import { Helmet } from 'react-helmet-async';
+import { getAllEmiCalculations, getAllUsers, deleteEmiCalculation, exportCalculationsAsCSV, downloadCSV } from '../services/supabaseApi';
 
-export default function Admin() {
+export default function Admin({ onNavigate }) {
   const [calculations, setCalculations] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    email: '',
-    loanType: '',
-  });
-  const [message, setMessage] = useState('');
+  const [users, setUsers] = useState([]);
+  const [filteredCalculations, setFilteredCalculations] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [searchEmail, setSearchEmail] = useState('');
+  const [message, setMessage] = useState(null);
+  const [sortConfig, setSortConfig] = useState({ key: 'email', direction: 'asc' });
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
-    loadCalculations();
+    loadData();
   }, []);
 
-  const loadCalculations = async () => {
-    setLoading(true);
+  const loadData = async () => {
+    setIsLoading(true);
     try {
-      const data = await getAllCalculations(filters);
-      setCalculations(data);
+      // Load calculations
+      const calcResponse = await getAllEmiCalculations();
+      if (calcResponse.success) {
+        setCalculations(calcResponse.data);
+        setFilteredCalculations(calcResponse.data);
+        setCurrentPage(1);
+      }
+
+      // Load users
+      const usersResponse = await getAllUsers();
+      if (usersResponse.success) {
+        setUsers(usersResponse.data);
+      }
     } catch (error) {
-      setMessage('Error loading calculations');
-      console.error(error);
+      console.error('Error loading data:', error);
+      setMessage({
+        type: 'error',
+        text: 'Failed to load data',
+      });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this calculation?')) {
-      try {
-        await deleteCalculation(id);
-        setCalculations(calculations.filter((calc) => calc.id !== id));
-        setMessage('Calculation deleted successfully');
-        setTimeout(() => setMessage(''), 3000);
-      } catch (error) {
-        setMessage('Error deleting calculation');
-        console.error(error);
+  const handleSearch = (email) => {
+    setSearchEmail(email);
+    setCurrentPage(1);
+    if (email.trim() === '') {
+      setFilteredCalculations(calculations);
+    } else {
+      const filtered = calculations.filter(calc =>
+        calc.email.toLowerCase().includes(email.toLowerCase())
+      );
+      setFilteredCalculations(filtered);
+    }
+  };
+
+  const handleSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+
+    const sorted = [...filteredCalculations].sort((a, b) => {
+      const aValue = a[key];
+      const bValue = b[key];
+
+      if (typeof aValue === 'string') {
+        return direction === 'asc'
+          ? aValue.localeCompare(bValue)
+          : bValue.localeCompare(aValue);
       }
+
+      return direction === 'asc' ? aValue - bValue : bValue - aValue;
+    });
+
+    setSortConfig({ key, direction });
+    setFilteredCalculations(sorted);
+    setCurrentPage(1);
+  };
+
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this calculation?')) {
+      return;
+    }
+
+    try {
+      const response = await deleteEmiCalculation(id);
+      if (response.success) {
+        setCalculations(calculations.filter(calc => calc.id !== id));
+        setFilteredCalculations(filteredCalculations.filter(calc => calc.id !== id));
+        setMessage({
+          type: 'success',
+          text: 'Calculation deleted successfully',
+        });
+        setTimeout(() => setMessage(null), 3000);
+      }
+    } catch (error) {
+      console.error('Error deleting calculation:', error);
+      setMessage({
+        type: 'error',
+        text: 'Failed to delete calculation',
+      });
     }
   };
 
   const handleExport = () => {
-    const csv = exportAsCSV(calculations);
-    downloadCSV(csv, `loan_calculations_${new Date().toISOString().split('T')[0]}.csv`);
+    try {
+      const csv = exportCalculationsAsCSV(filteredCalculations);
+      if (csv) {
+        downloadCSV(csv, `calculations_${new Date().toISOString().split('T')[0]}.csv`);
+        setMessage({
+          type: 'success',
+          text: 'Data exported successfully',
+        });
+        setTimeout(() => setMessage(null), 3000);
+      } else {
+        setMessage({
+          type: 'error',
+          text: 'No data to export',
+        });
+      }
+    } catch (error) {
+      console.error('Error exporting data:', error);
+      setMessage({
+        type: 'error',
+        text: 'Failed to export data',
+      });
+    }
   };
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+  const getSortIndicator = (key) => {
+    if (sortConfig.key !== key) return ' ↕️';
+    return sortConfig.direction === 'asc' ? ' ↑' : ' ↓';
   };
 
-  const handleApplyFilters = () => {
-    loadCalculations();
-  };
+  // Pagination calculations
+  const totalPages = Math.ceil(filteredCalculations.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCalculations = filteredCalculations.slice(startIndex, endIndex);
 
   return (
     <>
-      <SEO
-        title="Admin Dashboard - OpenLoanCalc Calculator Reports"
-        description="View and manage all loan calculations. Access admin dashboard to filter calculations by email or loan type."
-        keywords="admin dashboard, loan calculations, calculator reports, user data"
-        canonical="https://openloancalc.com/admin"
-        robots="noindex, follow"
-      />
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-        {/* Header */}
-        <header className="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-6 shadow-lg">
-          <div className="container mx-auto px-4">
-            <h1 className="text-4xl font-bold">Admin Dashboard</h1>
-            <p className="text-purple-100 text-lg mt-2">View and manage all loan calculations</p>
+      <Helmet>
+        <title>Admin Dashboard</title>
+        <meta name="description" content="Admin dashboard for managing loan calculations" />
+      </Helmet>
+
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+        <div className="container mx-auto max-w-7xl">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-bold text-slate-900 mb-2">📊 Admin Dashboard</h1>
+            <p className="text-lg text-slate-700">
+              Manage and view all saved loan calculations and user data
+            </p>
           </div>
-        </header>
 
-        {/* Main Content */}
-        <main className="py-8">
-          <div className="container mx-auto px-4">
-            {/* Filters */}
-            <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-              <h2 className="text-xl font-bold text-slate-900 mb-4">🔍 Filters</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Email</label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={filters.email}
-                    onChange={handleFilterChange}
-                    placeholder="user@example.com"
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-2">Loan Type</label>
-                  <select
-                    name="loanType"
-                    value={filters.loanType}
-                    onChange={handleFilterChange}
-                    className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  >
-                    <option value="">All Types</option>
-                    <option value="personal">Personal Loan</option>
-                    <option value="home">Home Loan</option>
-                    <option value="car">Car Loan</option>
-                    <option value="education">Education Loan</option>
-                    <option value="business">Business Loan</option>
-                    <option value="overdraft">Overdraft</option>
-                    <option value="custom">Custom Loan</option>
-                  </select>
-                </div>
-                <div className="flex items-end">
-                  <button
-                    onClick={handleApplyFilters}
-                    className="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 rounded-lg transition duration-200"
-                  >
-                    Apply Filters
-                  </button>
-                </div>
-              </div>
+          {/* Message */}
+          {message && (
+            <div className={`mb-6 p-4 rounded-lg border-l-4 ${
+              message.type === 'success'
+                ? 'bg-green-50 border-green-500'
+                : 'bg-red-50 border-red-500'
+            }`}>
+              <p className={`font-semibold ${
+                message.type === 'success'
+                  ? 'text-green-900'
+                  : 'text-red-900'
+              }`}>
+                {message.text}
+              </p>
             </div>
+          )}
 
-            {/* Message */}
-            {message && (
-              <div
-                className={`mb-6 p-4 rounded-lg text-center font-medium ${
-                  message.includes('successfully')
-                    ? 'bg-green-50 text-green-700 border border-green-200'
-                    : 'bg-red-50 text-red-700 border border-red-200'
-                }`}
-              >
-                {message}
+          {/* Controls */}
+          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-900 mb-2">
+                  Search by Email
+                </label>
+                <input
+                  type="email"
+                  value={searchEmail}
+                  onChange={(e) => handleSearch(e.target.value)}
+                  placeholder="Enter email address"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900"
+                />
               </div>
-            )}
-
-            {/* Export Button */}
-            {calculations.length > 0 && (
-              <div className="mb-6">
+              <div className="flex items-end gap-2">
                 <button
                   onClick={handleExport}
-                  className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition duration-200"
+                  disabled={filteredCalculations.length === 0}
+                  className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-slate-400 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
                 >
-                  📥 Export as CSV
+                  📥 Export to CSV
                 </button>
               </div>
-            )}
-
-            {/* Loading State */}
-            {loading && (
-              <div className="text-center py-12">
-                <p className="text-white text-lg">Loading calculations...</p>
+              <div className="flex items-end gap-2">
+                <button
+                  onClick={loadData}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200"
+                >
+                  🔄 Refresh
+                </button>
               </div>
-            )}
-
-            {/* Calculations Table */}
-            {!loading && calculations.length > 0 && (
-              <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead className="bg-slate-100 border-b-2 border-slate-300">
-                      <tr>
-                        <th className="px-6 py-4 text-left font-semibold text-slate-900">Email</th>
-                        <th className="px-6 py-4 text-left font-semibold text-slate-900">Loan Type</th>
-                        <th className="px-6 py-4 text-right font-semibold text-slate-900">Principal</th>
-                        <th className="px-6 py-4 text-right font-semibold text-slate-900">Rate %</th>
-                        <th className="px-6 py-4 text-right font-semibold text-slate-900">EMI</th>
-                        <th className="px-6 py-4 text-right font-semibold text-slate-900">Total Interest</th>
-                        <th className="px-6 py-4 text-left font-semibold text-slate-900">Date</th>
-                        <th className="px-6 py-4 text-center font-semibold text-slate-900">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {calculations.map((calc, index) => (
-                        <tr
-                          key={calc.id}
-                          className={index % 2 === 0 ? 'bg-white' : 'bg-slate-50'}
-                        >
-                          <td className="px-6 py-4 text-slate-900">{calc.email}</td>
-                          <td className="px-6 py-4 text-slate-900 capitalize">{calc.loan_type}</td>
-                          <td className="px-6 py-4 text-right text-slate-900">
-                            ₹{calc.principal.toLocaleString('en-IN')}
-                          </td>
-                          <td className="px-6 py-4 text-right text-slate-900">{calc.interest_rate}%</td>
-                          <td className="px-6 py-4 text-right text-blue-600 font-semibold">
-                            ₹{calc.emi.toLocaleString('en-IN')}
-                          </td>
-                          <td className="px-6 py-4 text-right text-orange-600 font-semibold">
-                            ₹{calc.total_interest.toLocaleString('en-IN')}
-                          </td>
-                          <td className="px-6 py-4 text-slate-600 text-sm">
-                            {new Date(calc.created_at).toLocaleString('en-IN')}
-                          </td>
-                          <td className="px-6 py-4 text-center">
-                            <button
-                              onClick={() => handleDelete(calc.id)}
-                              className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-xs font-medium transition duration-200"
-                            >
-                              Delete
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div className="bg-slate-50 px-6 py-4 border-t border-slate-200">
-                  <p className="text-sm text-slate-600">
-                    Total Records: <span className="font-bold text-slate-900">{calculations.length}</span>
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {/* No Data State */}
-            {!loading && calculations.length === 0 && (
-              <div className="bg-white rounded-lg shadow-lg p-12 text-center">
-                <p className="text-slate-900 text-lg mb-4">No calculations found</p>
-                <p className="text-slate-600">Try adjusting your filters or check back later</p>
-              </div>
-            )}
-
-            {/* Part Payment Calculator Emails Table */}
-            <div className="mt-12">
-              <PartPaymentEmailTable />
+            </div>
+            <div className="flex gap-4 text-sm text-slate-600 flex-wrap">
+              <p>
+                <strong>Total Calculations:</strong> {filteredCalculations.length}
+              </p>
+              <p>
+                <strong>Total Users:</strong> {users.length}
+              </p>
+              <p>
+                <strong>Showing:</strong> {startIndex + 1}-{Math.min(endIndex, filteredCalculations.length)} of {filteredCalculations.length}
+              </p>
             </div>
           </div>
-        </main>
 
-        {/* Footer */}
-        <footer className="bg-slate-900 text-slate-400 text-center py-6 mt-12 border-t border-slate-700">
-          <p>© 2026 Universal Emi Calculator - Admin Dashboard</p>
-        </footer>
+          {/* Loading State */}
+          {isLoading && (
+            <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+              <p className="text-lg text-slate-700">Loading data...</p>
+            </div>
+          )}
+
+          {/* EMI Calculations Table */}
+          {!isLoading && (
+            <>
+              <div className="mb-8">
+                <h2 className="text-2xl font-bold text-slate-900 mb-4">📋 EMI Calculations</h2>
+                {filteredCalculations.length === 0 ? (
+                  <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+                    <p className="text-lg text-slate-700">No calculations found</p>
+                  </div>
+                ) : (
+                  <>
+                    <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                      <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="bg-slate-100 border-b-2 border-slate-300">
+                              <th 
+                                className="text-left px-6 py-3 cursor-pointer hover:bg-slate-200"
+                                onClick={() => handleSort('email')}
+                              >
+                                Email {getSortIndicator('email')}
+                              </th>
+                              <th 
+                                className="text-left px-6 py-3 cursor-pointer hover:bg-slate-200"
+                                onClick={() => handleSort('loan_type')}
+                              >
+                                Loan Type {getSortIndicator('loan_type')}
+                              </th>
+                              <th className="text-left px-6 py-3">EMI Type</th>
+                              <th className="text-right px-6 py-3">Principal (₹)</th>
+                              <th className="text-right px-6 py-3">Interest Rate (%)</th>
+                              <th className="text-right px-6 py-3">Tenure (Months)</th>
+                              <th className="text-center px-6 py-3">Action</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {paginatedCalculations.map((calc) => (
+                              <tr key={calc.id} className="border-b border-slate-200 hover:bg-slate-50">
+                                <td className="px-6 py-3 text-slate-700 font-medium">{calc.email}</td>
+                                <td className="px-6 py-3 text-slate-700">{calc.loan_type}</td>
+                                <td className="px-6 py-3 text-slate-700">
+                                  {calc.emi_type === 'flat' ? 'Flat Rate' : 'Reducing Balance'}
+                                </td>
+                                <td className="text-right px-6 py-3 text-slate-700">
+                                  ₹{calc.principal.toLocaleString('en-IN')}
+                                </td>
+                                <td className="text-right px-6 py-3 text-slate-700">
+                                  {calc.interest_rate}%
+                                </td>
+                                <td className="text-right px-6 py-3 text-slate-700">
+                                  {calc.tenure_months} months
+                                </td>
+                                <td className="text-center px-6 py-3">
+                                  <button
+                                    onClick={() => handleDelete(calc.id)}
+                                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded transition duration-200 text-xs font-bold"
+                                  >
+                                    Delete
+                                  </button>
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    {/* PAGINATION CONTROLS - ENHANCED VISIBILITY */}
+                    {totalPages > 1 && (
+                      <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
+                        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                          
+                          {/* Items Per Page Selector */}
+                          <div className="flex items-center gap-3">
+                            <label className="text-sm font-semibold text-slate-900">
+                              Items per page:
+                            </label>
+                            <select
+                              value={itemsPerPage}
+                              onChange={(e) => {
+                                setItemsPerPage(parseInt(e.target.value));
+                                setCurrentPage(1);
+                              }}
+                              className="px-4 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-semibold text-slate-900 bg-white"
+                            >
+                              <option value="5">5 items</option>
+                              <option value="10">10 items</option>
+                              <option value="25">25 items</option>
+                              <option value="50">50 items</option>
+                              <option value="100">100 items</option>
+                            </select>
+                          </div>
+
+                          {/* Page Navigation */}
+                          <div className="flex items-center gap-2 flex-wrap justify-center">
+                            {/* Previous Button */}
+                            <button
+                              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                              disabled={currentPage === 1}
+                              className="px-6 py-2 bg-slate-600 hover:bg-slate-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg transition duration-200 font-bold text-sm"
+                            >
+                              ← Previous
+                            </button>
+
+                            {/* Page Number Buttons */}
+                            <div className="flex items-center gap-1">
+                              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                <button
+                                  key={page}
+                                  onClick={() => setCurrentPage(page)}
+                                  className={`px-3 py-2 rounded-lg font-bold transition duration-200 text-sm ${
+                                    currentPage === page
+                                      ? 'bg-blue-600 text-white border-2 border-blue-700'
+                                      : 'bg-slate-200 text-slate-900 hover:bg-slate-300 border-2 border-slate-300'
+                                  }`}
+                                >
+                                  {page}
+                                </button>
+                              ))}
+                            </div>
+
+                            {/* Next Button */}
+                            <button
+                              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+                              disabled={currentPage === totalPages}
+                              className="px-6 py-2 bg-slate-600 hover:bg-slate-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white rounded-lg transition duration-200 font-bold text-sm"
+                            >
+                              Next →
+                            </button>
+                          </div>
+
+                          {/* Page Info */}
+                          <div className="text-sm font-semibold text-slate-700 bg-blue-50 px-4 py-2 rounded-lg border-2 border-blue-200">
+                            Page <span className="text-blue-600 text-lg">{currentPage}</span> of <span className="text-blue-600 text-lg">{totalPages}</span>
+                          </div>
+                        </div>
+
+                        {/* Row Info */}
+                        <div className="mt-4 text-center text-sm text-slate-600">
+                          Showing rows <strong>{startIndex + 1}</strong>-<strong>{Math.min(endIndex, filteredCalculations.length)}</strong> of <strong>{filteredCalculations.length}</strong> total records
+                        </div>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+
+              {/* Users Table */}
+              <div>
+                <h2 className="text-2xl font-bold text-slate-900 mb-4">👥 Users</h2>
+                {users.length === 0 ? (
+                  <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+                    <p className="text-lg text-slate-700">No users found</p>
+                  </div>
+                ) : (
+                  <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-slate-100 border-b-2 border-slate-300">
+                            <th className="text-left px-6 py-3">Email</th>
+                            <th className="text-left px-6 py-3">Full Name</th>
+                            <th className="text-left px-6 py-3">Phone</th>
+                            <th className="text-left px-6 py-3">Created At</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {users.map((user) => (
+                            <tr key={user.id} className="border-b border-slate-200 hover:bg-slate-50">
+                              <td className="px-6 py-3 text-slate-700 font-medium">{user.email}</td>
+                              <td className="px-6 py-3 text-slate-700">
+                                {user.full_name || '-'}
+                              </td>
+                              <td className="px-6 py-3 text-slate-700">
+                                {user.phone || '-'}
+                              </td>
+                              <td className="px-6 py-3 text-slate-700">
+                                {new Date(user.created_at).toLocaleDateString('en-IN')}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </>
   );
