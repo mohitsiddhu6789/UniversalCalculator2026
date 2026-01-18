@@ -1,6 +1,49 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
+const SWP_FAQ_DATA = [
+  {
+    question: 'What is SWP (Systematic Withdrawal Plan)?',
+    answer: 'SWP is a strategy where you withdraw a fixed amount regularly from your investments while the remaining balance continues to earn returns. It is ideal for retirement planning and generating regular income from your investments.'
+  },
+  {
+    question: 'How is SWP different from SIP?',
+    answer: 'SIP (Systematic Investment Plan) involves regular investments into your portfolio. SWP (Systematic Withdrawal Plan) involves regular withdrawals from your portfolio. SWP is typically used after the accumulation phase is complete.'
+  },
+  {
+    question: 'What should be my monthly withdrawal amount?',
+    answer: 'Your withdrawal amount should be sustainable based on your investment growth and expected returns. As a rule of thumb, withdraw only 3-4% of your corpus annually. Use the calculator to test different withdrawal amounts and see the projection.'
+  },
+  {
+    question: 'Can my investment last for my desired period?',
+    answer: 'The calculator shows your final investment value after the withdrawal period. If it is positive, your investment lasts beyond the desired period. If it is zero or negative, adjust your withdrawal amount downward.'
+  },
+  {
+    question: 'Does higher expected return mean higher withdrawals?',
+    answer: 'Yes, higher returns mean your investment grows faster, allowing you to withdraw more while maintaining the capital for longer periods. Conversely, lower returns require lower withdrawals to preserve capital.'
+  },
+  {
+    question: 'What factors affect SWP success?',
+    answer: 'Key factors include: (1) Initial Investment - Larger corpus allows larger withdrawals, (2) Withdrawal Amount - Lower withdrawals preserve capital longer, (3) Expected Returns - Higher returns support larger withdrawals, (4) Duration - Longer periods require lower withdrawals.'
+  },
+  {
+    question: 'Is SWP suitable for retirement planning?',
+    answer: 'Yes, SWP is excellent for retirement planning. It provides regular income during retirement while allowing your remaining capital to continue earning returns, helping your corpus last longer.'
+  },
+  {
+    question: 'What is the 4% withdrawal rule?',
+    answer: 'The 4% rule suggests you can withdraw 4% of your initial investment corpus annually (about 0.33% monthly) and the money will last for 30+ years. This is conservative and suitable for long-term retirement planning.'
+  },
+  {
+    question: 'How does inflation affect SWP?',
+    answer: 'This calculator shows real values. In practice, you should increase your withdrawal amount annually by the inflation rate to maintain purchasing power. For example, if inflation is 5%, increase withdrawals by 5% each year.'
+  },
+  {
+    question: 'Can I modify my withdrawal amount later?',
+    answer: 'Yes, SWP is flexible. You can modify the withdrawal amount based on your needs and market performance. Use this calculator to re-plan whenever your circumstances change.'
+  }
+];
+
 export default function SWPCalculator({ onNavigate }) {
   const [formData, setFormData] = useState({
     investedAmount: 500000,
@@ -10,6 +53,7 @@ export default function SWPCalculator({ onNavigate }) {
   });
 
   const [result, setResult] = useState(null);
+  const [expandedFaqIndex, setExpandedFaqIndex] = useState(null);
 
   const handleInputChange = (field, value) => {
     const newData = { ...formData, [field]: parseFloat(value) || 0 };
@@ -64,6 +108,10 @@ export default function SWPCalculator({ onNavigate }) {
       totalReturnsEarned: Math.round(totalReturnsEarned * 100) / 100,
       months: Math.floor((totalWithdrawn / monthlyWithdrawal) || 0),
     });
+  };
+
+  const toggleFaq = (index) => {
+    setExpandedFaqIndex(expandedFaqIndex === index ? null : index);
   };
 
   return (
@@ -305,6 +353,51 @@ export default function SWPCalculator({ onNavigate }) {
                 </p>
               </div>
             </div>
+          </div>
+
+          {/* FAQ Section */}
+          <div className="mt-12">
+            <div className="mb-8">
+              <h2 className="text-3xl font-bold text-slate-900 mb-2">❓ Frequently Asked Questions</h2>
+              <p className="text-lg text-slate-700">
+                Find answers to common questions about SWP and retirement planning
+              </p>
+            </div>
+
+            {/* FAQ Items */}
+            <div className="space-y-4">
+              {SWP_FAQ_DATA.map((faq, index) => (
+                <div key={index} className="bg-white rounded-lg shadow-lg overflow-hidden">
+                  <button
+                    onClick={() => toggleFaq(index)}
+                    className="w-full flex items-start justify-between gap-4 p-6 text-left hover:bg-slate-50 transition duration-200"
+                  >
+                    <h4 className="font-semibold text-slate-900 flex-1">
+                      {faq.question}
+                    </h4>
+                    <span className={`flex-shrink-0 text-2xl transition-transform duration-300 ${expandedFaqIndex === index ? 'rotate-180' : ''}`}>
+                      📖
+                    </span>
+                  </button>
+
+                  {/* Answer */}
+                  {expandedFaqIndex === index && (
+                    <div className="px-6 pb-6 border-t border-slate-200">
+                      <p className="text-slate-700 leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer Info */}
+          <div className="mt-12 p-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+            <p className="text-slate-700">
+              <strong>💡 Tip:</strong> Use our SWP calculator to plan your retirement withdrawals. Remember to account for inflation by increasing your withdrawal amount annually. Visit the Help page for more comprehensive information about all calculators.
+            </p>
           </div>
         </div>
       </div>

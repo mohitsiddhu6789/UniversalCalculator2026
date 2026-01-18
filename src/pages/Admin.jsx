@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { getAllEmiCalculations, getAllUsers, deleteEmiCalculation, exportCalculationsAsCSV, downloadCSV } from '../services/supabaseApi';
+import { getAllEmiCalculations, getAllUsers, deleteEmiCalculation, exportCalculationsAsCSV, downloadCSV, deleteUser } from '../services/supabaseApi';
 
 export default function Admin({ onNavigate }) {
   const [calculations, setCalculations] = useState([]);
   const [users, setUsers] = useState([]);
   const [filteredCalculations, setFilteredCalculations] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchEmail, setSearchEmail] = useState('');
   const [message, setMessage] = useState(null);
@@ -14,6 +15,7 @@ export default function Admin({ onNavigate }) {
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [currentUserPage, setCurrentUserPage] = useState(1);
 
   useEffect(() => {
     loadData();
@@ -34,6 +36,7 @@ export default function Admin({ onNavigate }) {
       const usersResponse = await getAllUsers();
       if (usersResponse.success) {
         setUsers(usersResponse.data);
+        setFilteredUsers(usersResponse.data);
       }
     } catch (error) {
       console.error('Error loading data:', error);
@@ -56,6 +59,19 @@ export default function Admin({ onNavigate }) {
         calc.email.toLowerCase().includes(email.toLowerCase())
       );
       setFilteredCalculations(filtered);
+    }
+  };
+
+  const handleSearchUsers = (email) => {
+    setSearchEmail(email);
+    setCurrentUserPage(1);
+    if (email.trim() === '') {
+      setFilteredUsers(users);
+    } else {
+      const filtered = users.filter(user =>
+        user.email.toLowerCase().includes(email.toLowerCase())
+      );
+      setFilteredUsers(filtered);
     }
   };
 
@@ -108,6 +124,31 @@ export default function Admin({ onNavigate }) {
     }
   };
 
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) {
+      return;
+    }
+
+    try {
+      const response = await deleteUser(userId);
+      if (response.success) {
+        setUsers(users.filter(user => user.id !== userId));
+        setFilteredUsers(filteredUsers.filter(user => user.id !== userId));
+        setMessage({
+          type: 'success',
+          text: 'User deleted successfully',
+        });
+        setTimeout(() => setMessage(null), 3000);
+      }
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      setMessage({
+        type: 'error',
+        text: 'Failed to delete user',
+      });
+    }
+  };
+
   const handleExport = () => {
     try {
       const csv = exportCalculationsAsCSV(filteredCalculations);
@@ -143,6 +184,12 @@ export default function Admin({ onNavigate }) {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedCalculations = filteredCalculations.slice(startIndex, endIndex);
+
+  // Pagination users
+  const totalUserPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const userStartIndex = (currentUserPage - 1) * itemsPerPage;
+  const userEndIndex = userStartIndex + itemsPerPage;
+  const paginatedUsers = filteredUsers.slice(userStartIndex, userEndIndex);
 
   return (
     <>
@@ -395,10 +442,11 @@ export default function Admin({ onNavigate }) {
                             <th className="text-left px-6 py-3">Full Name</th>
                             <th className="text-left px-6 py-3">Phone</th>
                             <th className="text-left px-6 py-3">Created At</th>
+                            <th className="text-center px-6 py-3">Action</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {users.map((user) => (
+                          {paginatedUsers.map((user) => (
                             <tr key={user.id} className="border-b border-slate-200 hover:bg-slate-50">
                               <td className="px-6 py-3 text-slate-700 font-medium">{user.email}</td>
                               <td className="px-6 py-3 text-slate-700">
@@ -409,6 +457,14 @@ export default function Admin({ onNavigate }) {
                               </td>
                               <td className="px-6 py-3 text-slate-700">
                                 {new Date(user.created_at).toLocaleDateString('en-IN')}
+                              </td>
+                              <td className="text-center px-6 py-3">
+                                <button
+                                  onClick={() => handleDeleteUser(user.id)}
+                                  className="bg-red-500 hover:bg-red-600 text-white px-4 py-1 rounded transition duration-200 text-xs font-bold"
+                                >
+                                  Delete
+                                </button>
                               </td>
                             </tr>
                           ))}

@@ -120,10 +120,10 @@ const FAQ_DATA = [
   }
 ];
 
-export default function Home({ onNavigate, onEmiCalculated }) {
+export default function Home({ onNavigate, onEmiCalculated, userEmail }) {
   const { updateLoanData, saveLoanCalculation } = useContext(LoanContext);
   const [formData, setFormData] = useState({
-    email: '',
+    email: userEmail || '',
     principal: '',
     interestRate: '',
     tenure: '',
@@ -136,7 +136,11 @@ export default function Home({ onNavigate, onEmiCalculated }) {
 
   const handleCalculate = async (data) => {
     console.log('Home: handleCalculate called with:', data);
-    setFormData(data);
+    // Use userEmail from state if not in form
+    const emailToUse = userEmail || data.email;
+    const updatedData = { ...data, email: emailToUse };
+    
+    setFormData(updatedData);
     setIsSaving(true);
 
     try {
@@ -152,7 +156,7 @@ export default function Home({ onNavigate, onEmiCalculated }) {
       const totalInterest = emi * data.tenure - data.principal;
 
       const calculationResult = {
-        email: data.email,
+        email: emailToUse,
         principal: data.principal,
         interestRate: data.interestRate,
         tenure: data.tenure,

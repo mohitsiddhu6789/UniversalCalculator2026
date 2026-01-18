@@ -360,6 +360,30 @@ export const getAllUsers = async () => {
 };
 
 /**
+ * Delete a user from the users table
+ * @param {string} userId - User ID to delete
+ * @returns {Promise<Object>} Response object with success status
+ */
+export const deleteUser = async (userId) => {
+  try {
+    const { error } = await supabase
+      .from('users')
+      .delete()
+      .eq('id', userId);
+
+    if (error) {
+      throw new Error(`Error deleting user: ${error.message}`);
+    }
+
+    console.log('User deleted successfully:', userId);
+    return { success: true, message: 'User deleted successfully' };
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    throw error;
+  }
+};
+
+/**
  * =====================================================
  * UTILITY FUNCTIONS
  * =====================================================

@@ -1,11 +1,95 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
+const SCIENTIFIC_CALC_FAQ = [
+  {
+    question: 'What is the difference between RAD and DEG?',
+    answer: 'RAD (Radians): Standard mathematical unit where a full circle = 2π radians ≈ 6.28 radians. DEG (Degrees): Where a full circle = 360 degrees. Use DEG for everyday angles and navigation, RAD for scientific and mathematical calculations. Most programming languages use radians by default.'
+  },
+  {
+    question: 'What trigonometric functions are supported?',
+    answer: 'Supported trigonometric functions: sin (sine), cos (cosine), and tan (tangent). You can toggle between RAD (radians) and DEG (degrees) modes for angle calculations. For example: sin(π/2) = 1 in radians, sin(90°) = 1 in degrees.'
+  },
+  {
+    question: 'What logarithmic functions are available?',
+    answer: 'Two logarithmic functions: log (logarithm base 10, common logarithm) and ln (natural logarithm, base e ≈ 2.71828). log(100) = 2 and ln(e) = 1. Logarithms are useful for exponential calculations and scientific computations.'
+  },
+  {
+    question: 'What mathematical constants are available?',
+    answer: 'Two mathematical constants: π (pi ≈ 3.14159265...) used in geometry and trigonometry for circle calculations, and e (Euler\'s number ≈ 2.71828...) used in exponential and logarithmic calculations. You can insert these directly into your calculations.'
+  },
+  {
+    question: 'What power operations are supported?',
+    answer: 'Supported power operations: x² (square a number), x³ (cube a number), √ (square root), ∛ (cube root), and ^ (any power). Examples: 2² = 4, 2³ = 8, √16 = 4, ∛8 = 2, 2^5 = 32.'
+  },
+  {
+    question: 'How do I calculate reciprocal (1/x)?',
+    answer: 'The 1/x function calculates the reciprocal of a number. For example: 1/2 = 0.5, 1/4 = 0.25, 1/10 = 0.1. Reciprocals are useful in physics, chemistry, and engineering calculations. Dividing by zero is undefined.'
+  },
+  {
+    question: 'How do I use the power (^) function?',
+    answer: 'The ^ operator raises a number to a power. Format: base ^ exponent. Examples: 2^3 = 8, 5^2 = 25, 2^10 = 1024, 10^3 = 1000. This is different from x² and x³ which only square or cube numbers. ^ works for any exponent including fractional powers.'
+  },
+  {
+    question: 'What does the percentage (%) function do?',
+    answer: 'The % function converts a number to percentage by dividing by 100. For example: 50% = 0.5, 25% = 0.25, 100% = 1. This is useful for financial calculations, discount calculations, and probability calculations.'
+  },
+  {
+    question: 'What is π (pi) and when should I use it?',
+    answer: 'π (pi) is a mathematical constant ≈ 3.14159265... used extensively in geometry and trigonometry. It\'s the ratio of a circle\'s circumference to its diameter. Used in: circle area (πr²), circumference (2πr), sphere volume (4/3 πr³), and trigonometric calculations.'
+  },
+  {
+    question: 'What is e (Euler\'s number) and when should I use it?',
+    answer: 'e (Euler\'s number) ≈ 2.71828... is the base of natural logarithms. Used in: exponential growth/decay calculations, compound interest (A = Pe^rt), probability theory, and calculus. The function e^x grows exponentially and is fundamental to many scientific phenomena.'
+  },
+  {
+    question: 'How do I calculate sin, cos, tan for specific angles?',
+    answer: 'Enter the angle value, then click the trig function. Make sure you\'re in the correct mode (RAD or DEG). Examples in DEG: sin(30°) = 0.5, cos(60°) = 0.5, tan(45°) = 1. Examples in RAD: sin(π/6) = 0.5, cos(π/3) = 0.5, tan(π/4) = 1.'
+  },
+  {
+    question: 'How do I use the backspace button?',
+    answer: 'The backspace button (⌫) removes the last digit or character you entered. Useful for correcting mistakes without clearing the entire calculation. For example: if you type 1234 and want 123, click backspace once.'
+  },
+  {
+    question: 'What\'s the difference between Clear All and backspace?',
+    answer: 'Backspace (⌫) removes only the last character. Clear All clears everything including the current number, previous value, and any pending operation. Use backspace for small corrections, Clear All to start fresh.'
+  },
+  {
+    question: 'Can I calculate 0! (factorial)?',
+    answer: 'This calculator doesn\'t have a factorial button, but you can use it for other calculations. For reference: 0! = 1, 1! = 1, 5! = 120, 10! = 3,628,800. Factorials grow very quickly and are used in combinatorics and probability.'
+  },
+  {
+    question: 'How do I calculate inverse trigonometric functions (arcsin, arccos, arctan)?',
+    answer: 'This calculator doesn\'t have inverse trig functions. However, you can use logarithms or work with regular trig functions. For inverse functions, you may need a more advanced calculator or programming environment with asin(), acos(), atan() functions.'
+  },
+  {
+    question: 'What\'s the order of operations (PEMDAS/BODMAS)?',
+    answer: 'Order of operations: 1) Parentheses/Brackets, 2) Exponents/Orders, 3) Multiplication & Division (left to right), 4) Addition & Subtraction (left to right). Example: 2 + 3 × 4 = 14 (not 20) because multiplication comes before addition. This calculator follows standard mathematical order.'
+  },
+  {
+    question: 'Can I use parentheses in calculations?',
+    answer: 'Yes, this calculator supports parentheses. Use them to change the order of operations. Example: (2 + 3) × 4 = 20 (different from 2 + 3 × 4 = 14). Parentheses ensure calculations inside them are done first.'
+  },
+  {
+    question: 'What\'s the maximum precision of calculations?',
+    answer: 'This calculator displays results with high precision. However, due to computer floating-point arithmetic, results may have minor rounding errors beyond 10-15 decimal places. For most practical purposes, 6-8 decimal places provide sufficient precision.'
+  },
+  {
+    question: 'How do I calculate logarithm base other than 10 or e?',
+    answer: 'This calculator has log (base 10) and ln (natural log, base e). For other bases, use the change of base formula: log_b(x) = log(x) / log(b) or log_b(x) = ln(x) / ln(b). Example: log_2(8) = log(8) / log(2) = 3.'
+  },
+  {
+    question: 'What is e^x and how do I calculate it?',
+    answer: 'e^x represents e raised to the power x, which calculates exponential growth. This calculator supports this via the ^ operator: enter e, click ^, enter your exponent, then =. Example: e^1 ≈ 2.71828, e^2 ≈ 7.389. This is fundamental in calculus and physics.'
+  }
+];
+
 export default function ScientificCalculator({ onNavigate }) {
   const [display, setDisplay] = useState('0');
   const [previousValue, setPreviousValue] = useState(null);
   const [operation, setOperation] = useState(null);
-  const [angle, setAngle] = useState('RAD'); // RAD or DEG
+  const [angle, setAngle] = useState('RAD');
+  const [expandedFaqIndex, setExpandedFaqIndex] = useState(null);
 
   const handleNumber = (num) => {
     if (display === '0') {
@@ -137,6 +221,10 @@ export default function ScientificCalculator({ onNavigate }) {
     } else {
       setDisplay('0');
     }
+  };
+
+  const toggleFaq = (index) => {
+    setExpandedFaqIndex(expandedFaqIndex === index ? null : index);
   };
 
   return (
@@ -413,7 +501,7 @@ export default function ScientificCalculator({ onNavigate }) {
           </div>
 
           {/* Info Section */}
-          <div className="mt-8 bg-white rounded-lg shadow-lg p-6">
+          <div className="mt-8 bg-white rounded-lg shadow-lg p-6 mb-8">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">📚 Features</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
               <div>
@@ -441,6 +529,52 @@ export default function ScientificCalculator({ onNavigate }) {
                 <p>Percentage, reciprocal, backspace, clear all</p>
               </div>
             </div>
+          </div>
+
+          {/* FAQ Section */}
+          <div className="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-l-4 border-blue-500">
+              <h2 className="text-2xl font-bold text-slate-900">
+                ❓ Scientific Calculator FAQ
+              </h2>
+              <p className="text-slate-700 text-sm mt-1">Find answers to common questions about scientific calculations and functions</p>
+            </div>
+
+            {/* FAQ Items */}
+            <div className="divide-y divide-slate-200">
+              {SCIENTIFIC_CALC_FAQ.map((faq, index) => (
+                <div key={index} className="p-6">
+                  {/* Question */}
+                  <button
+                    onClick={() => toggleFaq(index)}
+                    className="w-full flex items-start justify-between gap-4 text-left hover:text-blue-600 transition duration-200"
+                  >
+                    <h3 className="font-semibold text-slate-900 flex-1">
+                      {faq.question}
+                    </h3>
+                    <span className={`flex-shrink-0 text-2xl transition-transform duration-300 ${expandedFaqIndex === index ? 'rotate-180' : ''}`}>
+                      📖
+                    </span>
+                  </button>
+
+                  {/* Answer */}
+                  {expandedFaqIndex === index && (
+                    <div className="mt-4 pt-4 border-t border-slate-200">
+                      <p className="text-slate-700 leading-relaxed">
+                        {faq.answer}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Footer Info */}
+          <div className="mt-12 p-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+            <p className="text-slate-700">
+              <strong>💡 Tip:</strong> Use our Scientific Calculator for complex mathematical calculations. Practice with different functions to master trigonometry, logarithms, and exponential calculations. Visit the Help page for comprehensive information about all calculators.
+            </p>
           </div>
         </div>
       </div>

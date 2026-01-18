@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { validateLoanInput } from '../utils/emiCalculator';
 
 const LOAN_TYPES = [
   { value: 'Personal Loan', label: '👤 Personal Loan' },
@@ -16,7 +15,6 @@ const EMI_TYPES = [
 
 export default function LoanForm({ onCalculate, isLoading = false }) {
   const [formData, setFormData] = useState({
-    email: '',
     loanType: 'Personal Loan',
     emiType: 'reducing',
     principal: '',
@@ -38,11 +36,6 @@ export default function LoanForm({ onCalculate, isLoading = false }) {
         [name]: '',
       }));
     }
-  };
-
-  const validateEmail = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
   };
 
   const validatePrincipal = (principal) => {
@@ -107,13 +100,6 @@ export default function LoanForm({ onCalculate, isLoading = false }) {
 
     const newErrors = {};
 
-    // Validate email
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email address is required';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Please enter a valid email address';
-    }
-
     // Validate principal
     const principalError = validatePrincipal(formData.principal);
     if (principalError) {
@@ -137,7 +123,6 @@ export default function LoanForm({ onCalculate, isLoading = false }) {
     // If no errors, proceed with calculation
     if (Object.keys(newErrors).length === 0) {
       onCalculate({
-        email: formData.email.trim(),
         principal: parseFloat(formData.principal),
         interestRate: parseFloat(formData.interestRate),
         tenure: parseInt(formData.tenure),
@@ -149,30 +134,9 @@ export default function LoanForm({ onCalculate, isLoading = false }) {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6">
-      <h3 className="text-2xl font-bold text-slate-900 mb-6">💳 Loan Details</h3>
+      <h2 className="text-2xl font-bold text-slate-900 mb-6">📋 Equated Monthly Installment Calculator</h2>
 
       <form onSubmit={handleCalculate} className="space-y-4">
-        {/* Email Address */}
-        <div>
-          <label className="block text-sm font-semibold text-slate-900 mb-2">
-            Email Address <span className="text-red-600">*</span>
-          </label>
-          <input
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="your.email@example.com"
-            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-slate-900 placeholder-slate-400 ${
-              errors.email ? 'border-red-500' : 'border-slate-300'
-            }`}
-          />
-          {errors.email && (
-            <p className="text-sm text-red-600 mt-1">❌ {errors.email}</p>
-          )}
-          <p className="text-xs text-slate-500 mt-1">We'll use this to save your calculations</p>
-        </div>
-
         {/* Loan Type */}
         <div>
           <label className="block text-sm font-semibold text-slate-900 mb-2">
