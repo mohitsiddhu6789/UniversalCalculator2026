@@ -5,6 +5,8 @@ import Header from './components/Header';
 import './App.css';
 import Home from './pages/Home';
 import PartPaymentCalculator from './pages/PartPaymentCalculator';
+import SWPCalculator from './pages/SWPCalculator';
+import ScientificCalculator from './pages/ScientificCalculator';
 import Admin from './pages/Admin';
 import Help from './pages/Help';
 
@@ -17,13 +19,13 @@ export default function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const page = urlParams.get('page');
     
-    if (page && ['home', 'part-payment', 'admin', 'help'].includes(page)) {
+    if (page && ['home', 'part-payment', 'swp', 'scientific', 'admin', 'help'].includes(page)) {
       console.log('Setting page from URL:', page);
       setCurrentPage(page);
     } else {
       // Check hash-based routing as fallback
       const hash = window.location.hash.slice(1);
-      if (hash && ['home', 'part-payment', 'admin', 'help'].includes(hash)) {
+      if (hash && ['home', 'part-payment', 'swp', 'scientific', 'admin', 'help'].includes(hash)) {
         console.log('Setting page from hash:', hash);
         setCurrentPage(hash);
       }
@@ -81,6 +83,26 @@ export default function App() {
                   💰 Part Payment
                 </button>
                 <button
+                  onClick={() => handleNavigate('swp')}
+                  className={`text-lg font-bold px-6 py-2 rounded-lg transition duration-200 ${
+                    currentPage === 'swp'
+                      ? 'bg-indigo-600 text-white'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700'
+                  }`}
+                >
+                  📊 SWP
+                </button>
+                <button
+                  onClick={() => handleNavigate('scientific')}
+                  className={`text-lg font-bold px-6 py-2 rounded-lg transition duration-200 ${
+                    currentPage === 'scientific'
+                      ? 'bg-cyan-600 text-white'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700'
+                  }`}
+                >
+                  🧮 Scientific
+                </button>
+                <button
                   onClick={() => handleNavigate('help')}
                   className={`text-lg font-bold px-6 py-2 rounded-lg transition duration-200 ${
                     currentPage === 'help'
@@ -90,17 +112,6 @@ export default function App() {
                 >
                   ❓ Help
                 </button>
-                {/* Admin button is hidden as per the change request */}
-                {/* <button
-                  onClick={() => handleNavigate('admin')}
-                  className={`text-lg font-bold px-6 py-2 rounded-lg transition duration-200 ${
-                    currentPage === 'admin'
-                      ? 'bg-purple-600 text-white'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-700'
-                  }`}
-                >
-                  📊 Admin
-                </button> */}
               </div>
             </div>
           </nav>
@@ -109,6 +120,8 @@ export default function App() {
           <div>
             {currentPage === 'home' && <Home onNavigate={handleNavigate} onEmiCalculated={setLatestEmiData} />}
             {currentPage === 'part-payment' && <PartPaymentCalculator onNavigate={handleNavigate} latestEmiData={latestEmiData} />}
+            {currentPage === 'swp' && <SWPCalculator onNavigate={handleNavigate} />}
+            {currentPage === 'scientific' && <ScientificCalculator onNavigate={handleNavigate} />}
             {currentPage === 'help' && <Help onNavigate={handleNavigate} />}
             {currentPage === 'admin' && <Admin onNavigate={handleNavigate} />}
           </div>

@@ -12,6 +12,16 @@ export default function Header({ onNavigate, latestEmiData }) {
     onNavigate('help');
   };
 
+  const handleSWPClick = () => {
+    // Navigate to SWP page
+    onNavigate('swp');
+  };
+
+  const handleScientificClick = () => {
+    // Navigate to Scientific Calculator page
+    onNavigate('scientific');
+  };
+
   return (
     <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-4 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
@@ -49,6 +59,18 @@ export default function Header({ onNavigate, latestEmiData }) {
               className="hover:text-blue-200 transition font-medium"
             >
               💰 Part Payment
+            </button>
+            <button
+              onClick={handleSWPClick}
+              className="hover:text-blue-200 transition font-medium"
+            >
+              📊 SWP
+            </button>
+            <button
+              onClick={handleScientificClick}
+              className="hover:text-blue-200 transition font-medium"
+            >
+              🧮 Scientific
             </button>
             <button
               onClick={handleHelpClick}
