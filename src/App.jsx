@@ -5,6 +5,7 @@ import Header from './components/Header';
 import './App.css';
 import Home from './pages/Home';
 import PartPaymentCalculator from './pages/PartPaymentCalculator';
+import Admin from './pages/Admin';
 import Help from './pages/Help';
 
 export default function App() {
@@ -16,13 +17,13 @@ export default function App() {
     const urlParams = new URLSearchParams(window.location.search);
     const page = urlParams.get('page');
     
-    if (page && ['home', 'part-payment', 'help'].includes(page)) {
+    if (page && ['home', 'part-payment', 'admin', 'help'].includes(page)) {
       console.log('Setting page from URL:', page);
       setCurrentPage(page);
     } else {
       // Check hash-based routing as fallback
       const hash = window.location.hash.slice(1);
-      if (hash && ['home', 'part-payment', 'help'].includes(hash)) {
+      if (hash && ['home', 'part-payment', 'admin', 'help'].includes(hash)) {
         console.log('Setting page from hash:', hash);
         setCurrentPage(hash);
       }
@@ -89,6 +90,17 @@ export default function App() {
                 >
                   ❓ Help
                 </button>
+                {/* Admin button is hidden as per the change request */}
+                {/* <button
+                  onClick={() => handleNavigate('admin')}
+                  className={`text-lg font-bold px-6 py-2 rounded-lg transition duration-200 ${
+                    currentPage === 'admin'
+                      ? 'bg-purple-600 text-white'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-700'
+                  }`}
+                >
+                  📊 Admin
+                </button> */}
               </div>
             </div>
           </nav>
@@ -98,6 +110,7 @@ export default function App() {
             {currentPage === 'home' && <Home onNavigate={handleNavigate} onEmiCalculated={setLatestEmiData} />}
             {currentPage === 'part-payment' && <PartPaymentCalculator onNavigate={handleNavigate} latestEmiData={latestEmiData} />}
             {currentPage === 'help' && <Help onNavigate={handleNavigate} />}
+            {currentPage === 'admin' && <Admin onNavigate={handleNavigate} />}
           </div>
         </div>
       </LoanProvider>
