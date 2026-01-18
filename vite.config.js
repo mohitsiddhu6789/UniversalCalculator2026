@@ -3,30 +3,30 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
+  
   server: {
-    port: 3000,
-    strictPort: false,
+    port: process.env.VITE_DEV_PORT || 5173,
+    open: true,
+    cors: true,
   },
+
   build: {
     outDir: 'dist',
     sourcemap: false,
-    minify: 'esbuild',
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          chartjs: ['chart.js', 'react-chartjs-2'],
-        },
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
       },
     },
   },
-  optimizeDeps: {
-    include: [
-      'react',
-      'react-dom',
-      '@supabase/supabase-js',
-      'react-helmet-async',
-      'chart.js',
-      'react-chartjs-2',
-    ],
+
+  define: {
+    __APP_VERSION__: JSON.stringify(process.env.VITE_APP_VERSION || '1.0.0'),
+    __ENVIRONMENT__: JSON.stringify(process.env.VITE_ENVIRONMENT || 'development'),
   },
+
+  // Environment variables
+  envDir: '.',
+  envPrefix: 'VITE_',
 })
