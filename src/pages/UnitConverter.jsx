@@ -156,19 +156,19 @@ export default function UnitConverter({ onNavigate }) {
         <meta name="description" content="Convert between different units of measurement" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-4 px-4">
         <div className="container mx-auto max-w-2xl">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">📏 Unit Converter</h1>
-            <p className="text-lg text-slate-700">
+          <div className="mb-4">
+            <h4 className="text-2xl font-bold text-slate-900 mb-2">📏 Unit Converter</h4>
+            <p className="text-sm text-slate-700">
               Convert between different units of measurement instantly
             </p>
           </div>
 
           {/* Category Selection */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-xl font-bold text-slate-900 mb-4">Select Category</h2>
+          <div className="bg-white rounded-lg shadow-lg p-4 mb-3">
+            <h2 className="text-sm font-semibold text-slate-900 mb-2">Select Category</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               {Object.entries(CONVERSION_UNITS).map(([key, value]) => (
                 <button
@@ -179,7 +179,7 @@ export default function UnitConverter({ onNavigate }) {
                     setToUnit(Object.keys(value.units)[1]);
                     setInputValue('');
                   }}
-                  className={`p-4 rounded-lg font-bold transition duration-200 ${
+                  className={`p-3 rounded-lg font-bold transition duration-200 text-sm ${
                     category === key
                       ? 'bg-blue-600 text-white shadow-lg'
                       : 'bg-slate-100 text-slate-900 hover:bg-slate-200'
@@ -193,22 +193,22 @@ export default function UnitConverter({ onNavigate }) {
           </div>
 
           {/* Converter */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-lg shadow-lg p-4 mb-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {/* From Unit */}
               <div>
-                <label className="block text-sm font-bold text-slate-900 mb-3">From</label>
+                <label className="block text-sm font-bold text-slate-900 mb-2">From</label>
                 <input
                   type="number"
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Enter value"
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-900 font-semibold text-lg mb-3"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-900 font-semibold text-sm mb-2"
                 />
                 <select
                   value={fromUnit}
                   onChange={(e) => setFromUnit(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-900 font-semibold"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-900 font-semibold"
                 >
                   {Object.entries(currentUnits).map(([key, unit]) => (
                     <option key={key} value={key}>
@@ -220,14 +220,14 @@ export default function UnitConverter({ onNavigate }) {
 
               {/* To Unit */}
               <div>
-                <label className="block text-sm font-bold text-slate-900 mb-3">To</label>
-                <div className="px-4 py-3 border-2 border-green-300 rounded-lg bg-green-50 font-semibold text-lg text-green-700 mb-3 min-h-12 flex items-center">
+                <label className="block text-sm font-bold text-slate-900 mb-2">To</label>
+                <div className="px-3 py-2 border-2 border-green-300 rounded-lg bg-green-50 font-semibold text-sm text-green-700 mb-2 min-h-10 flex items-center">
                   {convert() || '0'}
                 </div>
                 <select
                   value={toUnit}
                   onChange={(e) => setToUnit(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-900 font-semibold"
+                  className="w-full px-3 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-900 font-semibold"
                 >
                   {Object.entries(currentUnits).map(([key, unit]) => (
                     <option key={key} value={key}>
@@ -240,7 +240,7 @@ export default function UnitConverter({ onNavigate }) {
 
             {/* Conversion Formula */}
             {inputValue && (
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+              <div className="mt-3 p-3 bg-blue-50 rounded-lg border-l-4 border-blue-500">
                 <p className="text-sm text-slate-700">
                   <strong>{inputValue}</strong> {currentUnits[fromUnit].name} = 
                   <strong className="text-blue-600 ml-2">{convert()}</strong> {currentUnits[toUnit].name}
@@ -250,23 +250,23 @@ export default function UnitConverter({ onNavigate }) {
           </div>
 
           {/* Quick Reference */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h3 className="text-xl font-bold text-slate-900 mb-4">📚 Quick Reference</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-slate-700">
+          <div className="bg-white rounded-lg shadow-lg p-4 mb-3">
+            <h3 className="text-lg font-bold text-slate-900 mb-2">📚 Quick Reference</h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-slate-700">
               <div className="border-l-4 border-blue-500 pl-4">
-                <h4 className="font-bold text-slate-900 mb-2">Length</h4>
-                <p>1 km = 0.621371 miles</p>
-                <p>1 m = 3.28084 feet</p>
+                <h4 className="font-bold text-slate-900 text-sm mb-2">Length</h4>
+                <p className="text-xs text-slate-700">1 km = 0.621371 miles</p>
+                <p className="text-xs text-slate-700">1 m = 3.28084 feet</p>
               </div>
               <div className="border-l-4 border-green-500 pl-4">
-                <h4 className="font-bold text-slate-900 mb-2">Weight</h4>
-                <p>1 kg = 2.20462 pounds</p>
-                <p>1 ton = 1000 kg</p>
+                <h4 className="font-bold text-slate-900 text-sm mb-2">Weight</h4>
+                <p className="text-xs text-slate-700">1 kg = 2.20462 pounds</p>
+                <p className="text-xs text-slate-700">1 ton = 1000 kg</p>
               </div>
               <div className="border-l-4 border-purple-500 pl-4">
-                <h4 className="font-bold text-slate-900 mb-2">Volume</h4>
-                <p>1 liter = 0.264172 gallons</p>
-                <p>1 m³ = 1000 liters</p>
+                <h4 className="font-bold text-slate-900 text-sm mb-2">Volume</h4>
+                <p className="text-xs text-slate-700">1 liter = 0.264172 gallons</p>
+                <p className="text-xs text-slate-700">1 m³ = 1000 liters</p>
               </div>
             </div>
           </div>
@@ -274,7 +274,7 @@ export default function UnitConverter({ onNavigate }) {
           {/* FAQ Section */}
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
             <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-l-4 border-blue-500">
-              <h2 className="text-2xl font-bold text-slate-900">
+              <h2 className="text-lg font-bold text-slate-900">
                 ❓ Unit Converter FAQ
               </h2>
               <p className="text-slate-700 text-sm mt-1">Find answers to common questions about unit conversions and measurements</p>

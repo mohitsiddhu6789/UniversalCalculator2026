@@ -108,3 +108,10 @@ textarea:focus {
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out;
 }
+/* Mobile Navigation Sidebar */
+@media (max-width: 768px) {
+  /* Ensure body doesn't scroll when mobile menu is open */
+  body.mobile-menu-open {
+    overflow: hidden;
+  }
+}

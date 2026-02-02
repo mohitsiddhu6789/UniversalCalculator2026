@@ -40,21 +40,21 @@ export default function EmiResult({ result }) {
   return (
     <div className="space-y-6">
       <div className="bg-white rounded-lg shadow-lg p-6">
-        <h3 className="text-2xl font-bold text-slate-900 mb-6">📊 Calculation Results</h3>
+        <h3 className="text-lg font-bold text-slate-900 mb-6">📊 Calculation Results</h3>
 
         {/* Main EMI Card */}
         <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-lg p-6 mb-6">
           <p className="text-sm font-semibold text-blue-700 uppercase mb-2">Monthly EMI</p>
-          <p className="text-4xl font-bold text-blue-900">
+          <p className="text-2xl font-bold text-blue-900">
             ₹{Math.round(result.emi).toLocaleString('en-IN')}
           </p>
         </div>
 
         {/* Results Grid */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-slate-50 p-4 rounded-lg border-l-4 border-green-500">
             <p className="text-xs font-semibold text-slate-600 uppercase mb-2">Principal Amount</p>
-            <p className="text-2xl font-bold text-slate-900">
+            <p className="text-lg font-bold text-slate-900">
               ₹{result.principal.toLocaleString('en-IN')}
             </p>
           </div>
@@ -75,7 +75,7 @@ export default function EmiResult({ result }) {
 
           <div className="bg-slate-50 p-4 rounded-lg border-l-4 border-cyan-500">
             <p className="text-xs font-semibold text-slate-600 uppercase mb-2">Tenure</p>
-            <p className="text-2xl font-bold text-cyan-600">{result.tenure} months</p>
+            <p className="text-lg font-bold text-cyan-600">{result.tenure} months</p>
           </div>
         </div>
 

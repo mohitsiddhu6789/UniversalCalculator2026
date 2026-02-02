@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { LoanContext } from '../context/LoanContext';
 import LoanForm from '../components/LoanForm';
@@ -9,130 +9,37 @@ import { calculateEMI, calculateFlatRateEMI, generateEmiSchedule, generateFlatRa
 import { saveEmiCalculation, upsertUser } from '../services/supabaseApi';
 import { goToPartPayment, getEmiDataForPartPayment } from '../utils/navigationUtils';
 
-const FAQ_DATA = [
-  {
-    category: 'Personal Loan',
-    icon: '👤',
-    faqs: [
-      {
-        question: 'What is the typical interest rate range for personal loans?',
-        answer: 'Personal loan interest rates typically range from 8% to 18% per annum, depending on your credit score, income, and repayment capacity. Banks offer better rates to customers with good credit history.'
-      },
-      {
-        question: 'What is the maximum tenure for a personal loan?',
-        answer: 'Most banks offer personal loans with a tenure of 12 to 84 months (1-7 years). You can choose a tenure based on your monthly budget and repayment capacity.'
-      },
-      {
-        question: 'Is there a prepayment penalty for personal loans?',
-        answer: 'Most banks allow prepayment of personal loans without any penalty. However, some banks may charge 1-3% prepayment penalty. Always check with your bank before making a part payment.'
-      }
-    ]
-  },
-  {
-    category: 'Home Loan',
-    icon: '🏠',
-    faqs: [
-      {
-        question: 'What is the average home loan interest rate?',
-        answer: 'Home loan interest rates typically range from 6.5% to 9.5% per annum. Rates vary based on the loan amount, tenure, credit score, and current market conditions. Fixed rates offer stability while floating rates may decrease over time.'
-      },
-      {
-        question: 'What is the maximum tenure for a home loan?',
-        answer: 'Home loans typically have a tenure of 5 to 30 years. Longer tenures result in lower EMI but higher total interest. Most people choose 15-20 year tenures for an optimal balance.'
-      },
-      {
-        question: 'Can I make part payments on my home loan?',
-        answer: 'Yes, most banks allow part payments on home loans. Making part payments can significantly reduce your total interest and tenure. Some banks charge 0-2% prepayment penalty, so check the terms.'
-      }
-    ]
-  },
-  {
-    category: 'Auto Loan',
-    icon: '🚗',
-    faqs: [
-      {
-        question: 'What is the typical interest rate for auto loans?',
-        answer: 'Auto loan interest rates range from 7% to 14% per annum, depending on the vehicle type, loan amount, tenure, and your credit profile. New car loans often have lower rates than used car loans.'
-      },
-      {
-        question: 'What is the maximum tenure for an auto loan?',
-        answer: 'Auto loans typically have tenures ranging from 12 to 84 months (1-7 years). Most auto loans are taken for 36-60 months. Longer tenures result in lower monthly EMI but higher total interest.'
-      },
-      {
-        question: 'What are the key charges associated with auto loans?',
-        answer: 'Besides interest, auto loans may include processing fees (0.5-1.5%), insurance, GST on interest, and prepayment charges. Always calculate the total cost before finalizing the loan.'
-      }
-    ]
-  },
-  {
-    category: 'Education Loan',
-    icon: '🎓',
-    faqs: [
-      {
-        question: 'What is the interest rate for education loans?',
-        answer: 'Education loan interest rates typically range from 6% to 12% per annum. Government schemes may offer subsidized rates. Some loans offer lower rates during studies with interest accrual after graduation.'
-      },
-      {
-        question: 'What is the repayment tenure for education loans?',
-        answer: 'Education loans have a moratorium period (usually 6-12 months after graduation) before repayment starts. The total tenure is typically 5-15 years from the start of repayment, depending on the loan amount.'
-      },
-      {
-        question: 'Are education loans eligible for tax deduction?',
-        answer: 'Yes, education loan interest is eligible for tax deduction under Section 80E of the Income Tax Act. You can claim deduction for interest paid during the financial year, with no maximum limit.'
-      }
-    ]
-  },
-  {
-    category: 'Business Loan',
-    icon: '💼',
-    faqs: [
-      {
-        question: 'What is the interest rate for business loans?',
-        answer: 'Business loan interest rates range from 8% to 16% per annum, depending on the loan amount, business tenure, turnover, credit score, and loan type (term loan, working capital, etc.).'
-      },
-      {
-        question: 'What is the maximum tenure for a business loan?',
-        answer: 'Business loan tenures typically range from 1 to 10 years. Short-term business loans (12 months) are available for working capital needs, while long-term loans suit fixed asset purchases.'
-      },
-      {
-        question: 'What documents are required for a business loan?',
-        answer: 'Typically required documents include business registration, GST certificate, last 2 years ITR, bank statements (6-12 months), balance sheet, profit & loss statement, and personal identification proof.'
-      }
-    ]
-  },
-  {
-    category: 'EMI Calculator',
-    icon: '🧮',
-    faqs: [
-      {
-        question: 'What is the difference between Reducing Balance and Flat Rate EMI?',
-        answer: 'Reducing Balance: Interest is calculated on the outstanding balance each month. You pay less interest over time. Flat Rate: Interest is calculated on the original principal for all months. Total interest remains constant.'
-      },
-      {
-        question: 'How is EMI calculated?',
-        answer: 'For Reducing Balance: EMI = P × R × (1+R)^N / ((1+R)^N − 1), where P = Principal, R = Monthly Rate, N = Months. For Flat Rate: EMI = (Principal + Total Interest) / Number of Months.'
-      },
-      {
-        question: 'What factors affect my EMI amount?',
-        answer: 'EMI depends on: (1) Loan Amount - Higher amount = Higher EMI, (2) Interest Rate - Higher rate = Higher EMI, (3) Tenure - Longer tenure = Lower EMI but higher total interest.'
-      }
-    ]
-  }
-];
-
-export default function Home({ onNavigate, onEmiCalculated, userEmail }) {
+export default function Home({ onNavigate, onEmiCalculated, userEmail, latestEmiData }) {
   const { updateLoanData, saveLoanCalculation } = useContext(LoanContext);
   const [formData, setFormData] = useState({
     email: userEmail || '',
-    principal: '',
-    interestRate: '',
-    tenure: '',
-    loanType: 'Personal Loan',
-    emiType: 'reducing',
+    principal: latestEmiData?.principal || '',
+    interestRate: latestEmiData?.interestRate || '',
+    tenure: latestEmiData?.tenure || '',
+    loanType: latestEmiData?.loanType || 'Personal Loan',
+    emiType: latestEmiData?.emiType || 'reducing',
   });
-  const [result, setResult] = useState(null);
-  const [expandedFaqIndex, setExpandedFaqIndex] = useState(null);
+  const [result, setResult] = useState(latestEmiData || null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [modalEmail, setModalEmail] = useState(userEmail || '');
+  const [showPartPaymentEmailModal, setShowPartPaymentEmailModal] = useState(false);
+  const [partPaymentEmail, setPartPaymentEmail] = useState(userEmail || '');
+
+  // Sync result and formData when latestEmiData changes (e.g., from navigation back to page)
+  useEffect(() => {
+    if (latestEmiData) {
+      setResult(latestEmiData);
+      setFormData(prev => ({
+        ...prev,
+        principal: latestEmiData.principal || '',
+        interestRate: latestEmiData.interestRate || '',
+        tenure: latestEmiData.tenure || '',
+        loanType: latestEmiData.loanType || 'Personal Loan',
+        emiType: latestEmiData.emiType || 'reducing',
+      }));
+    }
+  }, [latestEmiData]);
 
   const handleCalculate = async (data) => {
     console.log('Home: handleCalculate called with:', data);
@@ -196,31 +103,168 @@ export default function Home({ onNavigate, onEmiCalculated, userEmail }) {
   };
 
   const handleGoToPartPayment = () => {
-    console.log('Home: handleGoToPartPayment called');
+    if (!result) return;
+    
+    // If email already exists, go directly to part payment
+    if (userEmail) {
+      const emiData = {
+        ...getEmiDataForPartPayment(result),
+        email: userEmail
+      };
+      const success = goToPartPayment(onNavigate, emiData);
+      if (success) {
+        updateLoanData({
+          email: userEmail,
+          principal: formData.principal,
+          interestRate: formData.interestRate,
+          tenure: formData.tenure,
+          loanType: formData.loanType,
+          emiType: formData.emiType,
+        });
+        saveLoanCalculation(result);
+      }
+      return;
+    }
+    
+    // Show email modal first
+    setShowPartPaymentEmailModal(true);
+  };
 
-    // Get EMI data
-    const emiData = getEmiDataForPartPayment(result);
+  const handleProceedToPartPayment = async () => {
+    if (!partPaymentEmail || !partPaymentEmail.trim()) {
+      alert('❌ Please enter an email address');
+      return;
+    }
 
-    // Use shared navigation function
-    const success = goToPartPayment(onNavigate, emiData);
-
-    if (success) {
-      // Save data to context
-      updateLoanData({
-        email: formData.email,
-        principal: formData.principal,
-        interestRate: formData.interestRate,
-        tenure: formData.tenure,
-        loanType: formData.loanType,
-        emiType: formData.emiType,
+    try {
+      const emailToSave = partPaymentEmail.toLowerCase();
+      // Save/update user with email
+      await upsertUser({
+        email: emailToSave,
+        fullName: 'User',
+        phone: null,
+        isAdmin: false,
       });
 
-      saveLoanCalculation(result);
+      // Store email in sessionStorage for persistence
+      sessionStorage.setItem('userEmail', emailToSave);
+
+      // Close modal
+      setShowPartPaymentEmailModal(false);
+
+      // Get EMI data and add email
+      const emiData = {
+        ...getEmiDataForPartPayment(result),
+        email: partPaymentEmail
+      };
+
+      // Use shared navigation function
+      const success = goToPartPayment(onNavigate, emiData);
+
+      if (success) {
+        // Save data to context
+        updateLoanData({
+          email: partPaymentEmail,
+          principal: formData.principal,
+          interestRate: formData.interestRate,
+          tenure: formData.tenure,
+          loanType: formData.loanType,
+          emiType: formData.emiType,
+        });
+
+        saveLoanCalculation(result);
+      }
+    } catch (error) {
+      console.error('Error saving email:', error);
+      alert('❌ Error: Could not save email. Please try again.');
     }
   };
 
-  const toggleFaq = (index) => {
-    setExpandedFaqIndex(expandedFaqIndex === index ? null : index);
+  const handleCancelPartPaymentEmail = () => {
+    setShowPartPaymentEmailModal(false);
+    setPartPaymentEmail(userEmail || '');
+  };
+
+  const handleDownloadDetails = () => {
+    if (!result) return;
+    // Show email modal first
+    setShowEmailModal(true);
+  };
+
+  const handleDownloadWithEmail = async () => {
+    if (!modalEmail || !modalEmail.trim()) {
+      alert('❌ Please enter an email address');
+      return;
+    }
+
+    try {
+      // Save/update user with email
+      await upsertUser({
+        email: modalEmail.toLowerCase(),
+        fullName: 'User',
+        phone: null,
+        isAdmin: false,
+      });
+
+      // Close modal
+      setShowEmailModal(false);
+
+      // Generate and download file
+      const details = `
+=================================================
+        EMI CALCULATION DETAILS REPORT
+=================================================
+
+Calculation Date: ${new Date().toLocaleString()}
+Email: ${modalEmail}
+
+LOAN INFORMATION:
+==================
+Loan Type: ${result.loanType}
+Principal Amount: ₹${result.principal.toLocaleString('en-IN')}
+Annual Interest Rate: ${result.interestRate}%
+Tenure: ${result.tenure} months (${Math.floor(result.tenure / 12)} years ${result.tenure % 12} months)
+EMI Type: ${result.emiType === 'flat' ? 'Flat Rate' : 'Reducing Balance'}
+
+CALCULATION RESULTS:
+====================
+Monthly EMI: ₹${result.emi.toFixed(2).toLocaleString('en-IN')}
+Total Interest: ₹${result.totalInterest.toFixed(2).toLocaleString('en-IN')}
+Total Payment: ₹${result.totalPayment.toFixed(2).toLocaleString('en-IN')}
+
+AMORTIZATION SCHEDULE:
+======================
+Month | Outstanding Balance | EMI | Principal | Interest
+${result.schedule.map((entry, index) => 
+  `${(index + 1).toString().padStart(5)} | ₹${entry.balance.toFixed(2).padStart(18)} | ₹${entry.emi.toFixed(2).padStart(8)} | ₹${entry.principal.toFixed(2).padStart(9)} | ₹${entry.interest.toFixed(2).padStart(8)}`
+).join('\n')}
+
+=================================================
+Generated by Universal Calculators
+=================================================
+      `.trim();
+
+      const element = document.createElement('a');
+      element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(details));
+      element.setAttribute('download', `EMI_Details_${result.principal}_${new Date().toISOString().split('T')[0]}.txt`);
+      element.style.display = 'none';
+      document.body.appendChild(element);
+      element.click();
+      document.body.removeChild(element);
+
+      // Reset modal email
+      setModalEmail(userEmail || '');
+    } catch (error) {
+      console.error('Error saving email or downloading:', error);
+      alert('❌ Error: Could not save email. Please try again.');
+    }
+  };
+
+  const handleLoanTypeChange = (loanType) => {
+    setFormData(prev => ({
+      ...prev,
+      loanType: loanType,
+    }));
   };
 
   return (
@@ -230,33 +274,41 @@ export default function Home({ onNavigate, onEmiCalculated, userEmail }) {
         <meta name="description" content="Calculate your loan EMI, total interest, and view amortization schedule" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+      <div className="bg-gradient-to-br from-slate-50 to-slate-100 pt-2 pb-4 px-2">
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">🧮 EMI Calculator</h1>
-            <p className="text-lg text-slate-700">
+          <div className="mb-2">
+            <h4 className="text-xl font-bold text-slate-900 mb-1">🧮 EMI Calculator</h4>
+            <p className="text-xs text-slate-700">
               Calculate your loan EMI, total interest, and view month-wise payment schedule
             </p>
           </div>
 
-          {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Form */}
+          {/* Main Content - Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 auto-rows-max">
+            {/* Left Column - Calculator Form */}
             <div className="lg:col-span-1">
-              <LoanForm onCalculate={handleCalculate} isLoading={isSaving} />
+              <LoanForm onCalculate={handleCalculate} isLoading={isSaving} onLoanTypeChange={handleLoanTypeChange} />
             </div>
 
-            {/* Right Column - Results */}
-            <div className="lg:col-span-2">
+            {/* Right Column - Loan Details */}
+            <div className="lg:col-span-3 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 200px)' }}>
               {result ? (
-                <div className="space-y-6">
+                <div className="space-y-2">
                   {/* EMI Type Badge */}
-                  <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
-                    <p className="text-sm text-blue-900">
+                  <div className="bg-blue-50 border-l-4 border-blue-500 p-2 rounded">
+                    <p className="text-xs text-blue-900">
                       <strong>EMI Type:</strong> {result.emiType === 'flat' ? '📊 Flat Rate' : '📉 Reducing Balance'}
                     </p>
                   </div>
+
+                  {/* Download Button */}
+                  <button
+                    onClick={handleDownloadDetails}
+                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-bold py-1.5 px-3 rounded text-xs transition duration-200 flex items-center justify-center gap-2 shadow-lg"
+                  >
+                    ⬇️ Download Loan Details
+                  </button>
 
                   {/* EMI Result Card */}
                   <div>
@@ -266,7 +318,7 @@ export default function Home({ onNavigate, onEmiCalculated, userEmail }) {
                   {/* Go to Part Payment Button */}
                   <button
                     onClick={handleGoToPartPayment}
-                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-4 px-6 rounded-lg transition duration-200 flex items-center justify-center gap-2 shadow-lg text-lg"
+                    className="w-full bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white font-bold py-2 px-4 rounded text-sm transition duration-200 flex items-center justify-center gap-2 shadow-lg"
                   >
                     💰 Go to Part Payment Calculator
                   </button>
@@ -280,85 +332,105 @@ export default function Home({ onNavigate, onEmiCalculated, userEmail }) {
                   <div>
                     <EmiTable schedule={result.schedule} />
                   </div>
+
+                  {/* Download Full Details Section */}
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 border-l-4 border-green-500 p-3 rounded-lg shadow-md">
+                    <h3 className="font-bold text-sm text-green-900 mb-2">📥 Export Your Calculation</h3>
+                    <p className="text-xs text-green-800 mb-3">Download your complete loan calculation details including the full amortization schedule.</p>
+                    <button
+                      onClick={handleDownloadDetails}
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg text-sm transition duration-200 flex items-center justify-center gap-2 shadow-lg"
+                    >
+                      📊 Download Full Loan Schedule (TXT)
+                    </button>
+                  </div>
                 </div>
               ) : (
-                <div className="bg-white rounded-lg shadow-lg p-8 text-center">
-                  <div className="text-6xl mb-4">📊</div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Enter Your Loan Details</h3>
-                  <p className="text-slate-600">
-                    Fill in the loan information on the left to see your EMI calculation, total interest, and payment schedule
+                <div className="bg-white rounded shadow p-4 text-center h-auto flex flex-col items-center justify-center">
+                  <div className="text-4xl mb-2">📊</div>
+                  <h3 className="text-sm font-bold text-slate-900 mb-1">Enter Your Loan Details</h3>
+                  <p className="text-xs text-slate-600">
+                    Fill in the calculator on the left to see your EMI calculation, total interest, and payment schedule
                   </p>
                 </div>
               )}
             </div>
           </div>
-
-          {/* FAQ Section */}
-          <div className="mt-16">
-            <div className="mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">❓ Frequently Asked Questions</h2>
-              <p className="text-lg text-slate-700">
-                Find answers to common questions about loans and EMI calculations
-              </p>
-            </div>
-
-            {/* FAQ Categories */}
-            <div className="space-y-8">
-              {FAQ_DATA.map((faqCategory, categoryIndex) => (
-                <div key={categoryIndex} className="bg-white rounded-lg shadow-lg overflow-hidden">
-                  {/* Category Header */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-l-4 border-blue-500">
-                    <h3 className="text-xl font-bold text-slate-900">
-                      {faqCategory.icon} {faqCategory.category}
-                    </h3>
-                  </div>
-
-                  {/* FAQs */}
-                  <div className="divide-y divide-slate-200">
-                    {faqCategory.faqs.map((faq, faqIndex) => {
-                      const globalIndex = categoryIndex * 100 + faqIndex;
-                      const isExpanded = expandedFaqIndex === globalIndex;
-
-                      return (
-                        <div key={faqIndex} className="p-6">
-                          {/* Question */}
-                          <button
-                            onClick={() => toggleFaq(globalIndex)}
-                            className="w-full flex items-start justify-between gap-4 text-left hover:text-blue-600 transition duration-200"
-                          >
-                            <h4 className="font-semibold text-slate-900 flex-1">
-                              {faq.question}
-                            </h4>
-                            <span className={`flex-shrink-0 text-2xl transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
-                              📖
-                            </span>
-                          </button>
-
-                          {/* Answer */}
-                          {isExpanded && (
-                            <div className="mt-4 pt-4 border-t border-slate-200">
-                              <p className="text-slate-700 leading-relaxed">
-                                {faq.answer}
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Footer Info */}
-          <div className="mt-16 p-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
-            <p className="text-slate-700">
-              <strong>💡 Tip:</strong> Use our EMI calculator to compare different loan options and make an informed decision. Visit the Part Payment Calculator to analyze how part payments can reduce your total interest and tenure.
-            </p>
-          </div>
         </div>
       </div>
+
+      {/* Email Modal */}
+      {showEmailModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">📧 Provide Email Address</h3>
+            <p className="text-sm text-slate-600 mb-4">
+              Please enter your email address to save and download your loan calculation details.
+            </p>
+            
+            <input
+              type="email"
+              value={modalEmail}
+              onChange={(e) => setModalEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 mb-4"
+            />
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => {
+                  setShowEmailModal(false);
+                  setModalEmail(userEmail || '');
+                }}
+                className="flex-1 px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-900 font-bold rounded-lg transition duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDownloadWithEmail}
+                className="flex-1 px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition duration-200"
+              >
+                Download
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Part Payment Email Modal */}
+      {showPartPaymentEmailModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl p-6 max-w-md w-full">
+            <h3 className="text-lg font-bold text-slate-900 mb-4">📧 Email Address Required</h3>
+            <p className="text-sm text-slate-600 mb-4">
+              Please provide your email address to proceed to the Part Payment Calculator. Your EMI calculation results will remain visible here.
+            </p>
+            
+            <input
+              type="email"
+              value={partPaymentEmail}
+              onChange={(e) => setPartPaymentEmail(e.target.value)}
+              placeholder="Enter your email"
+              className="w-full px-4 py-2 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 mb-4"
+            />
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleCancelPartPaymentEmail}
+                className="flex-1 px-4 py-2 bg-slate-300 hover:bg-slate-400 text-slate-900 font-bold rounded-lg transition duration-200"
+              >
+                Back to EMI
+              </button>
+              <button
+                onClick={handleProceedToPartPayment}
+                className="flex-1 px-4 py-2 bg-orange-600 hover:bg-orange-700 text-white font-bold rounded-lg transition duration-200"
+              >
+                Go to Part Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

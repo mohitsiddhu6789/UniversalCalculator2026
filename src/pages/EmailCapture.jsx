@@ -49,7 +49,7 @@ export default function EmailCapture({ onEmailSubmit }) {
           <div className="bg-white rounded-xl shadow-2xl p-8 md:p-10">
             {/* Header */}
             <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-slate-900 mb-2">💰 Universal</h1>
+              <h4 className="text-2xl font-bold text-slate-900 mb-2">💰 Universal</h4>
               <p className="text-lg text-slate-600">All-in-One Calculator & Converter Suite</p>
             </div>
 

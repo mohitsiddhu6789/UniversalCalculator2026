@@ -202,8 +202,8 @@ export default function Admin({ onNavigate }) {
         <div className="container mx-auto max-w-7xl">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">📊 Admin Dashboard</h1>
-            <p className="text-lg text-slate-700">
+            <h4 className="text-2xl font-bold text-slate-900 mb-2">📊 Admin Dashboard</h4>
+            <p className="text-sm text-slate-700">
               Manage and view all saved loan calculations and user data
             </p>
           </div>

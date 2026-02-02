@@ -8,7 +8,7 @@ export default function EmiTable({ schedule }) {
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 mt-6">
-      <h3 className="text-xl font-bold text-slate-900 mb-4">📋 EMI Schedule</h3>
+      <h3 className="text-sm font-semibold text-slate-900 mb-4">📋 EMI Schedule</h3>
 
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
@@ -51,7 +51,7 @@ export default function EmiTable({ schedule }) {
           onClick={() => setExpanded(!expanded)}
           className="mt-4 w-full bg-slate-200 hover:bg-slate-300 text-slate-900 font-semibold py-2 rounded-lg transition duration-200"
         >
-          {expanded ? '▲ Show Less' : '▼ Show All ' + schedule.length + ' Months'}
+          {expanded ? '▲ Show Less' : `▼ Show All ${schedule.length} Months`}
         </button>
       )}
 
@@ -60,19 +60,19 @@ export default function EmiTable({ schedule }) {
         <div className="grid grid-cols-3 gap-4">
           <div>
             <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Total EMI</p>
-            <p className="text-lg font-bold text-slate-900">
+            <p className="text-base font-semibold text-slate-900">
               ₹{(schedule.reduce((sum, row) => sum + row.emi, 0)).toLocaleString('en-IN')}
             </p>
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Total Principal</p>
-            <p className="text-lg font-bold text-green-600">
+            <p className="text-base font-semibold text-green-600">
               ₹{(schedule.reduce((sum, row) => sum + row.principal, 0)).toLocaleString('en-IN')}
             </p>
           </div>
           <div>
             <p className="text-xs font-semibold text-slate-600 uppercase mb-1">Total Interest</p>
-            <p className="text-lg font-bold text-orange-600">
+            <p className="text-base font-semibold text-orange-600">
               ₹{(schedule.reduce((sum, row) => sum + row.interest, 0)).toLocaleString('en-IN')}
             </p>
           </div>

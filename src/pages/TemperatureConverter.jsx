@@ -139,60 +139,60 @@ export default function TemperatureConverter({ onNavigate }) {
         <meta name="description" content="Convert between Celsius, Fahrenheit, and Kelvin" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-4 px-4">
         <div className="container mx-auto max-w-2xl">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">🌡️ Temperature Converter</h1>
-            <p className="text-lg text-slate-700">
+          <div className="mb-4">
+            <h4 className="text-2xl font-bold text-slate-900 mb-2">🌡️ Temperature Converter</h4>
+            <p className="text-sm text-slate-700">
               Convert between Celsius, Fahrenheit, and Kelvin scales
             </p>
           </div>
 
           {/* Converter */}
-          <div className="bg-white rounded-lg shadow-lg p-8 mb-8">
-            <div className="space-y-6">
+          <div className="bg-white rounded-lg shadow-lg p-4 mb-3">
+            <div className="space-y-3">
               {/* Celsius */}
-              <div className="border-l-4 border-blue-500 pl-6">
-                <label className="block text-sm font-bold text-slate-900 mb-3">°C (Celsius)</label>
+              <div className="border-l-4 border-blue-500 pl-4">
+                <label className="block text-sm font-bold text-slate-900 mb-2">°C (Celsius)</label>
                 <input
                   type="number"
                   value={celsius}
                   onChange={(e) => handleCelsiusChange(e.target.value)}
                   placeholder="Enter temperature"
-                  className="w-full px-4 py-3 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-900 font-semibold text-lg"
+                  className="w-full px-3 py-2 border-2 border-blue-300 rounded-lg focus:outline-none focus:border-blue-500 text-slate-900 font-semibold text-sm"
                 />
               </div>
 
               {/* Fahrenheit */}
-              <div className="border-l-4 border-orange-500 pl-6">
-                <label className="block text-sm font-bold text-slate-900 mb-3">°F (Fahrenheit)</label>
+              <div className="border-l-4 border-orange-500 pl-4">
+                <label className="block text-sm font-bold text-slate-900 mb-2">°F (Fahrenheit)</label>
                 <input
                   type="number"
                   value={fahrenheit}
                   onChange={(e) => handleFahrenheitChange(e.target.value)}
                   placeholder="Enter temperature"
-                  className="w-full px-4 py-3 border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500 text-slate-900 font-semibold text-lg"
+                  className="w-full px-3 py-2 border-2 border-orange-300 rounded-lg focus:outline-none focus:border-orange-500 text-slate-900 font-semibold text-sm"
                 />
               </div>
 
               {/* Kelvin */}
-              <div className="border-l-4 border-purple-500 pl-6">
-                <label className="block text-sm font-bold text-slate-900 mb-3">K (Kelvin)</label>
+              <div className="border-l-4 border-purple-500 pl-4">
+                <label className="block text-sm font-bold text-slate-900 mb-2">K (Kelvin)</label>
                 <input
                   type="number"
                   value={kelvin}
                   onChange={(e) => handleKelvinChange(e.target.value)}
                   placeholder="Enter temperature"
-                  className="w-full px-4 py-3 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 text-slate-900 font-semibold text-lg"
+                  className="w-full px-3 py-2 border-2 border-purple-300 rounded-lg focus:outline-none focus:border-purple-500 text-slate-900 font-semibold text-sm"
                 />
               </div>
             </div>
 
             {/* Conversion Formulas */}
-            <div className="mt-8 p-6 bg-slate-50 rounded-lg border-2 border-slate-200">
-              <h3 className="font-bold text-slate-900 mb-4">📐 Conversion Formulas</h3>
-              <div className="space-y-3 text-sm text-slate-700 font-mono">
+            <div className="mt-3 p-3 bg-slate-50 rounded-lg border-2 border-slate-200">
+              <h3 className="font-bold text-slate-900 mb-2">📐 Conversion Formulas</h3>
+              <div className="space-y-1.5 text-xs text-slate-700 font-mono">
                 <p><strong>°C to °F:</strong> (°C × 9/5) + 32</p>
                 <p><strong>°F to °C:</strong> (°F − 32) × 5/9</p>
                 <p><strong>°C to K:</strong> °C + 273.15</p>
@@ -203,45 +203,45 @@ export default function TemperatureConverter({ onNavigate }) {
           </div>
 
           {/* Reference Points */}
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h3 className="text-xl font-bold text-slate-900 mb-4">📚 Reference Points</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700">
-              <div className="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-500">
-                <p className="font-bold text-slate-900">Water Freezes</p>
-                <p>0°C = 32°F = 273.15K</p>
+          <div className="bg-white rounded-lg shadow-lg p-4 mb-3">
+            <h3 className="text-lg font-bold text-slate-900 mb-3">📚 Reference Points</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-slate-700">
+              <div className="bg-blue-50 p-3 rounded-lg border-l-4 border-blue-500">
+                <p className="font-bold text-slate-900 text-sm">Water Freezes</p>
+                <p className="text-xs text-slate-700">0°C = 32°F = 273.15K</p>
               </div>
-              <div className="bg-orange-50 p-4 rounded-lg border-l-4 border-orange-500">
-                <p className="font-bold text-slate-900">Room Temperature</p>
-                <p>20°C = 68°F = 293.15K</p>
+              <div className="bg-orange-50 p-3 rounded-lg border-l-4 border-orange-500">
+                <p className="font-bold text-slate-900 text-sm">Room Temperature</p>
+                <p className="text-xs text-slate-700">20°C = 68°F = 293.15K</p>
               </div>
-              <div className="bg-red-50 p-4 rounded-lg border-l-4 border-red-500">
-                <p className="font-bold text-slate-900">Water Boils</p>
-                <p>100°C = 212°F = 373.15K</p>
+              <div className="bg-red-50 p-3 rounded-lg border-l-4 border-red-500">
+                <p className="font-bold text-slate-900 text-sm">Water Boils</p>
+                <p className="text-xs text-slate-700">100°C = 212°F = 373.15K</p>
               </div>
-              <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
-                <p className="font-bold text-slate-900">Absolute Zero</p>
-                <p>−273.15°C = −459.67°F = 0K</p>
+              <div className="bg-purple-50 p-3 rounded-lg border-l-4 border-purple-500">
+                <p className="font-bold text-slate-900 text-sm">Absolute Zero</p>
+                <p className="text-xs text-slate-700">−273.15°C = −459.67°F = 0K</p>
               </div>
             </div>
           </div>
 
           {/* FAQ Section */}
           <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-l-4 border-blue-500">
-              <h2 className="text-2xl font-bold text-slate-900">
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1.5 border-l-4 border-blue-500">
+              <h2 className="text-lg font-bold text-slate-900">
                 ❓ Temperature Converter FAQ
               </h2>
-              <p className="text-slate-700 text-sm mt-1">Find answers to common questions about temperature scales and conversions</p>
+              <p className="text-slate-700 text-xs mt-0.5">Find answers to common questions about temperature scales and conversions</p>
             </div>
 
             {/* FAQ Items */}
             <div className="divide-y divide-slate-200">
               {TEMPERATURE_CONVERTER_FAQ.map((faq, index) => (
-                <div key={index} className="p-6">
+                <div key={index} className="p-3">
                   {/* Question */}
                   <button
                     onClick={() => toggleFaq(index)}
-                    className="w-full flex items-start justify-between gap-4 text-left hover:text-blue-600 transition duration-200"
+                    className="w-full flex items-start justify-between gap-2 text-left hover:text-blue-600 transition duration-200"
                   >
                     <h3 className="font-semibold text-slate-900 flex-1">
                       {faq.question}
@@ -253,8 +253,8 @@ export default function TemperatureConverter({ onNavigate }) {
 
                   {/* Answer */}
                   {expandedFaqIndex === index && (
-                    <div className="mt-4 pt-4 border-t border-slate-200">
-                      <p className="text-slate-700 leading-relaxed">
+                    <div className="mt-2 pt-2 border-t border-slate-200">
+                      <p className="text-slate-700 leading-relaxed text-sm">
                         {faq.answer}
                       </p>
                     </div>
@@ -265,8 +265,8 @@ export default function TemperatureConverter({ onNavigate }) {
           </div>
 
           {/* Footer Info */}
-          <div className="mt-12 p-6 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
-            <p className="text-slate-700">
+          <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+            <p className="text-slate-700 text-xs">
               <strong>💡 Tip:</strong> Use our Temperature Converter for quick conversions between temperature scales. Perfect for cooking, science experiments, weather information, and travel. Visit the Help page for comprehensive information about all calculators.
             </p>
           </div>

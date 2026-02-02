@@ -47,7 +47,7 @@ export default function PartPaymentEmailTable() {
     <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-2xl font-bold text-slate-900">📧 Part Payment Calculator Emails</h3>
+          <h3 className="text-sm font-semibold text-slate-900">📧 Part Payment Calculator Emails</h3>
           <p className="text-slate-600 text-sm mt-1">Track all users who access the Part Payment Calculator</p>
         </div>
         <div className="flex gap-3">
@@ -65,17 +65,17 @@ export default function PartPaymentEmailTable() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
           <p className="text-slate-600 text-sm font-semibold">Total Accesses</p>
-          <p className="text-3xl font-bold text-blue-600">{emails.length}</p>
+          <p className="text-lg font-semibold text-blue-600">{emails.length}</p>
         </div>
         <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
           <p className="text-slate-600 text-sm font-semibold">Unique Emails</p>
-          <p className="text-3xl font-bold text-purple-600">
+          <p className="text-lg font-semibold text-purple-600">
             {new Set(emails.map((e) => e.email)).size}
           </p>
         </div>
         <div className="bg-orange-50 p-4 rounded-lg border border-orange-200">
           <p className="text-slate-600 text-sm font-semibold">Last Access</p>
-          <p className="text-lg font-bold text-orange-600">
+          <p className="text-base font-semibold text-orange-600">
             {emails.length > 0
               ? new Date(emails[emails.length - 1].timestamp).toLocaleDateString()
               : 'N/A'}

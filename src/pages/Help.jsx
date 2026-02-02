@@ -182,18 +182,18 @@ export default function Help({ onNavigate }) {
         <meta name="description" content="Get help and support for using all calculators and converters" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-4 px-4">
         <div className="container mx-auto max-w-4xl">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">❓ Help & Support</h1>
-            <p className="text-lg text-slate-700">
+          <div className="mb-4">
+            <h4 className="text-2xl font-bold text-slate-900 mb-2">❓ Help & Support</h4>
+            <p className="text-sm text-slate-700">
               Complete guide to all our calculators and converters
             </p>
           </div>
 
           {/* Quick Navigation */}
-          <div className="mb-8 grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="mb-4 grid grid-cols-2 md:grid-cols-3 gap-2">
             {faqSections.map((section, index) => (
               <button
                 key={index}
@@ -201,26 +201,26 @@ export default function Help({ onNavigate }) {
                 className="bg-white hover:bg-blue-50 p-4 rounded-lg shadow border-l-4 border-blue-500 transition duration-200 text-left"
               >
                 <span className="text-2xl">{section.icon}</span>
-                <p className="text-sm font-bold text-slate-900 mt-2">{section.title}</p>
+                <p className="text-xs font-bold text-slate-900 mt-2">{section.title}</p>
               </button>
             ))}
           </div>
 
           {/* Calculators Section Overview */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">🧮 Our Calculators</h2>
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-slate-900 mb-3">🧮 Our Calculators</h2>
             
-            <div className="space-y-4">
+            <div className="space-y-2">
               {/* EMI Calculator */}
-              <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-blue-500">
-                <div className="flex items-start gap-4">
+              <div className="bg-white rounded-lg shadow-lg p-4 border-l-4 border-blue-500">
+                <div className="flex items-start gap-2">
                   <span className="text-3xl">🏠</span>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">EMI Calculator</h3>
-                    <p className="text-slate-700 mb-3">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">EMI Calculator</h3>
+                    <p className="text-slate-700 mb-2 text-sm">
                       Calculate your loan EMI (Equated Monthly Installment) for any type of loan including personal, home, auto, education, and business loans.
                     </p>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 mb-3">
+                    <div className="grid grid-cols-2 gap-1.5 text-xs text-slate-600 mb-2">
                       <div>✓ Multiple loan types</div>
                       <div>✓ Flexible tenure</div>
                       <div>✓ Month-wise schedule</div>
@@ -230,7 +230,7 @@ export default function Help({ onNavigate }) {
                     </div>
                     <button
                       onClick={() => onNavigate('home')}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200"
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-lg text-sm font-medium transition duration-200"
                     >
                       Go to EMI Calculator
                     </button>
@@ -239,15 +239,15 @@ export default function Help({ onNavigate }) {
               </div>
 
               {/* Part Payment Calculator */}
-              <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-orange-500">
-                <div className="flex items-start gap-4">
+              <div className="bg-white rounded-lg shadow-lg p-4 border-l-4 border-orange-500">
+                <div className="flex items-start gap-2">
                   <span className="text-3xl">💰</span>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">Part Payment Calculator</h3>
-                    <p className="text-slate-700 mb-3">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">Part Payment Calculator</h3>
+                    <p className="text-slate-700 mb-2 text-sm">
                       Analyze the impact of part payments (prepayments) on your loan. See how much interest you can save and reduce your tenure with multiple payment strategies.
                     </p>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 mb-3">
+                    <div className="grid grid-cols-2 gap-1.5 text-xs text-slate-600 mb-2">
                       <div>✓ Multiple part payments</div>
                       <div>✓ Custom penalties</div>
                       <div>✓ 3 strategies</div>
@@ -257,7 +257,7 @@ export default function Help({ onNavigate }) {
                     </div>
                     <button
                       onClick={() => onNavigate('part-payment')}
-                      className="bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200"
+                      className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-1 rounded-lg text-sm font-medium transition duration-200"
                     >
                       Go to Part Payment
                     </button>
@@ -266,15 +266,15 @@ export default function Help({ onNavigate }) {
               </div>
 
               {/* SWP Calculator */}
-              <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-indigo-500">
-                <div className="flex items-start gap-4">
+              <div className="bg-white rounded-lg shadow-lg p-4 border-l-4 border-indigo-500">
+                <div className="flex items-start gap-2">
                   <span className="text-3xl">📊</span>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">SWP Calculator</h3>
-                    <p className="text-slate-700 mb-3">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">SWP Calculator</h3>
+                    <p className="text-slate-700 mb-2 text-sm">
                       Systematic Withdrawal Plan (SWP) calculator for planning regular withdrawals from your investments while maintaining growth and ensuring sustainability.
                     </p>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 mb-3">
+                    <div className="grid grid-cols-2 gap-1.5 text-xs text-slate-600 mb-2">
                       <div>✓ Flexible investment amounts</div>
                       <div>✓ Custom withdrawal amounts</div>
                       <div>✓ Variable returns</div>
@@ -284,7 +284,7 @@ export default function Help({ onNavigate }) {
                     </div>
                     <button
                       onClick={() => onNavigate('swp')}
-                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200"
+                      className="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1 rounded-lg text-sm font-medium transition duration-200"
                     >
                       Go to SWP Calculator
                     </button>
@@ -293,15 +293,15 @@ export default function Help({ onNavigate }) {
               </div>
 
               {/* Scientific Calculator */}
-              <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-cyan-500">
-                <div className="flex items-start gap-4">
+              <div className="bg-white rounded-lg shadow-lg p-4 border-l-4 border-cyan-500">
+                <div className="flex items-start gap-2">
                   <span className="text-3xl">🧮</span>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">Scientific Calculator</h3>
-                    <p className="text-slate-700 mb-3">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">Scientific Calculator</h3>
+                    <p className="text-slate-700 mb-2 text-sm">
                       Advanced scientific calculator for complex mathematical calculations including trigonometric, logarithmic, and power functions with full precision.
                     </p>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 mb-3">
+                    <div className="grid grid-cols-2 gap-1.5 text-xs text-slate-600 mb-2">
                       <div>✓ Trigonometric functions</div>
                       <div>✓ Logarithmic functions</div>
                       <div>✓ Power operations</div>
@@ -311,7 +311,7 @@ export default function Help({ onNavigate }) {
                     </div>
                     <button
                       onClick={() => onNavigate('scientific')}
-                      className="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200"
+                      className="bg-cyan-600 hover:bg-cyan-700 text-white px-3 py-1 rounded-lg text-sm font-medium transition duration-200"
                     >
                       Go to Scientific Calculator
                     </button>
@@ -322,20 +322,20 @@ export default function Help({ onNavigate }) {
           </div>
 
           {/* Converters Section Overview */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">🔄 Unit Converters</h2>
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-slate-900 mb-3">🔄 Unit Converters</h2>
             
             <div className="space-y-4">
               {/* Unit Converter */}
-              <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-green-500">
-                <div className="flex items-start gap-4">
+              <div className="bg-white rounded-lg shadow-lg p-4 border-l-4 border-green-500">
+                <div className="flex items-start gap-2">
                   <span className="text-3xl">📏</span>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">Unit Converter</h3>
-                    <p className="text-slate-700 mb-3">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">Unit Converter</h3>
+                    <p className="text-slate-700 mb-2 text-sm">
                       Convert between different units of measurement including length, weight, and volume. Supports both metric and imperial systems with high precision.
                     </p>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 mb-3">
+                    <div className="grid grid-cols-2 gap-1.5 text-xs text-slate-600 mb-2">
                       <div>✓ Length conversion</div>
                       <div>✓ Weight/Mass conversion</div>
                       <div>✓ Volume conversion</div>
@@ -343,7 +343,7 @@ export default function Help({ onNavigate }) {
                       <div>✓ Real-time conversion</div>
                       <div>✓ Metric & Imperial</div>
                     </div>
-                    <div className="mb-3 p-3 bg-green-50 rounded-lg text-sm text-slate-700">
+                    <div className="mb-2 p-2 bg-green-50 rounded-lg text-xs text-slate-700">
                       <strong>Supported Conversions:</strong>
                       <ul className="mt-2 space-y-1">
                         <li>📏 <strong>Length:</strong> m, km, cm, mm, mi, yd, ft, in</li>
@@ -353,7 +353,7 @@ export default function Help({ onNavigate }) {
                     </div>
                     <button
                       onClick={() => onNavigate('units')}
-                      className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200"
+                      className="bg-green-600 hover:bg-green-700 text-white px-3 py-1 rounded-lg text-sm font-medium transition duration-200"
                     >
                       Go to Unit Converter
                     </button>
@@ -362,15 +362,15 @@ export default function Help({ onNavigate }) {
               </div>
 
               {/* Temperature Converter */}
-              <div className="bg-white rounded-lg shadow-lg p-6 border-l-4 border-red-500">
-                <div className="flex items-start gap-4">
+              <div className="bg-white rounded-lg shadow-lg p-4 border-l-4 border-red-500">
+                <div className="flex items-start gap-2">
                   <span className="text-3xl">🌡️</span>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2">Temperature Converter</h3>
-                    <p className="text-slate-700 mb-3">
+                    <h3 className="text-lg font-bold text-slate-900 mb-1">Temperature Converter</h3>
+                    <p className="text-slate-700 mb-2 text-sm">
                       Convert between Celsius, Fahrenheit, and Kelvin temperature scales. Perfect for scientific calculations, cooking, and everyday temperature conversions.
                     </p>
-                    <div className="grid grid-cols-2 gap-2 text-sm text-slate-600 mb-3">
+                    <div className="grid grid-cols-2 gap-1.5 text-xs text-slate-600 mb-2">
                       <div>✓ Celsius ↔ Fahrenheit</div>
                       <div>✓ Celsius ↔ Kelvin</div>
                       <div>✓ Fahrenheit ↔ Kelvin</div>
@@ -378,7 +378,7 @@ export default function Help({ onNavigate }) {
                       <div>✓ Reference points</div>
                       <div>✓ Full precision</div>
                     </div>
-                    <div className="mb-3 p-3 bg-red-50 rounded-lg text-sm text-slate-700">
+                    <div className="mb-2 p-2 bg-red-50 rounded-lg text-xs text-slate-700">
                       <strong>Quick Reference Points:</strong>
                       <ul className="mt-2 space-y-1">
                         <li>❄️ Water Freezes: 0°C = 32°F = 273.15K</li>
@@ -388,7 +388,7 @@ export default function Help({ onNavigate }) {
                     </div>
                     <button
                       onClick={() => onNavigate('temperature')}
-                      className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-medium transition duration-200"
+                      className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg text-sm font-medium transition duration-200"
                     >
                       Go to Temperature Converter
                     </button>
@@ -399,15 +399,15 @@ export default function Help({ onNavigate }) {
           </div>
 
           {/* FAQ Sections */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-6">📚 Frequently Asked Questions</h2>
+          <div className="mb-4">
+            <h2 className="text-lg font-bold text-slate-900 mb-3">📚 Frequently Asked Questions</h2>
             
-            <div className="space-y-8">
+            <div className="space-y-3">
               {faqSections.map((section, sectionIndex) => (
                 <div key={sectionIndex} id={`section-${sectionIndex}`} className="bg-white rounded-lg shadow-lg overflow-hidden">
                   {/* Section Header */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-l-4 border-blue-500">
-                    <h3 className="text-xl font-bold text-slate-900">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-4 py-2 border-l-4 border-blue-500">
+                    <h3 className="text-lg font-bold text-slate-900">
                       {section.icon} {section.title}
                     </h3>
                   </div>
@@ -419,13 +419,13 @@ export default function Help({ onNavigate }) {
                       const isExpanded = expandedFaq === globalIndex;
 
                       return (
-                        <div key={faqIndex} className="p-6">
+                        <div key={faqIndex} className="p-3">
                           {/* Question */}
                           <button
                             onClick={() => toggleFaq(globalIndex)}
-                            className="w-full flex items-start justify-between gap-4 text-left hover:text-blue-600 transition duration-200"
+                            className="w-full flex items-start justify-between gap-2 text-left hover:text-blue-600 transition duration-200"
                           >
-                            <h4 className="font-semibold text-slate-900 flex-1">
+                            <h4 className="font-semibold text-slate-900 flex-1 text-sm">
                               {faq.q}
                             </h4>
                             <span className={`flex-shrink-0 text-2xl transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}>
@@ -435,8 +435,8 @@ export default function Help({ onNavigate }) {
 
                           {/* Answer */}
                           {isExpanded && (
-                            <div className="mt-4 pt-4 border-t border-slate-200">
-                              <p className="text-slate-700 leading-relaxed">
+                            <div className="mt-2 pt-2 border-t border-slate-200">
+                              <p className="text-slate-700 leading-relaxed text-sm">
                                 {faq.a}
                               </p>
                             </div>
@@ -453,7 +453,7 @@ export default function Help({ onNavigate }) {
           {/* Key Features Summary */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg shadow-lg p-6 border-l-4 border-blue-600">
-              <h3 className="font-bold text-slate-900 mb-3 text-lg">✨ Calculators Features</h3>
+              <h3 className="font-bold text-slate-900 mb-3 text-sm">✨ Calculators Features</h3>
               <ul className="space-y-2 text-sm text-slate-700">
                 <li>✓ Auto-save calculations</li>
                 <li>✓ Email-based history</li>
@@ -465,7 +465,7 @@ export default function Help({ onNavigate }) {
             </div>
 
             <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg shadow-lg p-6 border-l-4 border-green-600">
-              <h3 className="font-bold text-slate-900 mb-3 text-lg">🔄 Converters Features</h3>
+              <h3 className="font-bold text-slate-900 mb-3 text-sm">🔄 Converters Features</h3>
               <ul className="space-y-2 text-sm text-slate-700">
                 <li>✓ Real-time conversion</li>
                 <li>✓ Multiple units</li>
@@ -479,47 +479,47 @@ export default function Help({ onNavigate }) {
 
           {/* Tips */}
           <div className="bg-white rounded-lg shadow-lg p-6 mb-8">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">💡 Tips & Tricks</h2>
-            <ul className="space-y-3 text-slate-700">
+            <h2 className="text-lg font-bold text-slate-900 mb-3">💡 Tips & Tricks</h2>
+            <ul className="space-y-3 text-slate-700 text-sm">
               <li className="flex items-start gap-3">
-                <span className="text-lg">✓</span>
+                <span className="text-sm flex-shrink-0 font-bold">✓</span>
                 <span>Click on any FAQ section header above to quickly navigate to that section</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-lg">✓</span>
+                <span className="text-sm flex-shrink-0 font-bold">✓</span>
                 <span>All calculations are saved automatically - bookmark your results easily</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-lg">✓</span>
+                <span className="text-sm flex-shrink-0 font-bold">✓</span>
                 <span>Use keyboard for faster navigation on scientific calculator</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-lg">✓</span>
+                <span className="text-sm flex-shrink-0 font-bold">✓</span>
                 <span>Converters support real-time conversion as you type</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-lg">✓</span>
+                <span className="text-sm flex-shrink-0 font-bold">✓</span>
                 <span>Try different scenarios to find the best option for your needs</span>
               </li>
             </ul>
           </div>
 
           {/* Contact Support */}
-          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-lg p-6 border-l-4 border-blue-500">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">📞 Need More Help?</h2>
-            <p className="text-slate-700 mb-4">If you have questions or need further assistance, please refer to the FAQ sections above or contact our support team.</p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-lg p-4 border-l-4 border-blue-500">
+            <h2 className="text-lg font-bold text-slate-900 mb-3">📞 Need More Help?</h2>
+            <p className="text-slate-700 mb-3 text-sm">If you have questions or need further assistance, please refer to the FAQ sections above or contact our support team.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
-                <h4 className="font-bold text-slate-900 mb-2">📧 Email</h4>
-                <p className="text-slate-600">support@universal.com</p>
+                <h4 className="font-bold text-slate-900 text-sm mb-2">📧 Email</h4>
+                <p className="text-slate-600 text-xs">support@universal.com</p>
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 mb-2">💬 Chat</h4>
-                <p className="text-slate-600">Live chat available 24/7</p>
+                <h4 className="font-bold text-slate-900 text-sm mb-2">💬 Chat</h4>
+                <p className="text-slate-600 text-xs">Live chat available 24/7</p>
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 mb-2">📱 Phone</h4>
-                <p className="text-slate-600">+91 XXXX XXX XXX</p>
+                <h4 className="font-bold text-slate-900 text-sm mb-2">📱 Phone</h4>
+                <p className="text-slate-600 text-xs">+91 XXXX XXX XXX</p>
               </div>
             </div>
             <p className="text-sm text-slate-600 mt-4">Version 1.0 | Universal Calculators & Converters © 2024</p>

@@ -121,28 +121,28 @@ export default function SWPCalculator({ onNavigate }) {
         <meta name="description" content="Calculate your Systematic Withdrawal Plan returns" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-4 px-4">
         <div className="container mx-auto max-w-6xl">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-slate-900 mb-2">📊 SWP Calculator</h1>
-            <p className="text-lg text-slate-700">
+          <div className="mb-4">
+            <h4 className="text-2xl font-bold text-slate-900 mb-2">📊 SWP Calculator</h4>
+            <p className="text-sm text-slate-700">
               Calculate your Systematic Withdrawal Plan and projected returns
             </p>
           </div>
 
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
             {/* Left Column - Form */}
-            <div className="bg-white rounded-lg shadow-lg p-6">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">💰 Investment Details</h2>
+            <div className="bg-white rounded-lg shadow-lg p-4">
+              <h2 className="text-lg font-bold text-slate-900 mb-3">💰 Investment Details</h2>
 
               {/* Total Investment */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-900 mb-3">
+              <div className="mb-3">
+                <label className="block text-sm font-semibold text-slate-900 mb-2">
                   Total Investment
                 </label>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <span className="text-2xl">₹</span>
                   <input
                     type="range"
@@ -164,11 +164,11 @@ export default function SWPCalculator({ onNavigate }) {
               </div>
 
               {/* Monthly Withdrawal */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-900 mb-3">
+              <div className="mb-3">
+                <label className="block text-sm font-semibold text-slate-900 mb-2">
                   Monthly Withdrawal
                 </label>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <span className="text-2xl">₹</span>
                   <input
                     type="range"
@@ -190,11 +190,11 @@ export default function SWPCalculator({ onNavigate }) {
               </div>
 
               {/* Expected Returns */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-900 mb-3">
+              <div className="mb-3">
+                <label className="block text-sm font-semibold text-slate-900 mb-2">
                   Expected Returns (%)
                 </label>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <input
                     type="range"
                     min="1"
@@ -215,11 +215,11 @@ export default function SWPCalculator({ onNavigate }) {
               </div>
 
               {/* Duration */}
-              <div className="mb-6">
-                <label className="block text-sm font-semibold text-slate-900 mb-3">
+              <div className="mb-3">
+                <label className="block text-sm font-semibold text-slate-900 mb-2">
                   Duration (Years)
                 </label>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
                   <input
                     type="range"
                     min="1"
@@ -241,46 +241,46 @@ export default function SWPCalculator({ onNavigate }) {
             </div>
 
             {/* Right Column - Results */}
-            <div className="space-y-6">
+            <div className="space-y-3">
               {result ? (
                 <>
                   {/* Main Results */}
-                  <div className="bg-white rounded-lg shadow-lg p-6">
-                    <h2 className="text-2xl font-bold text-slate-900 mb-6">📈 Results</h2>
+                  <div className="bg-white rounded-lg shadow-lg p-4">
+                    <h2 className="text-lg font-bold text-slate-900 mb-3">📏 Results</h2>
 
-                    <div className="space-y-4">
+                    <div className="space-y-2">
                       {/* Invested Amount */}
-                      <div className="bg-slate-50 p-4 rounded-lg border-l-4 border-blue-500">
+                      <div className="bg-slate-50 p-3 rounded-lg border-l-4 border-blue-500">
                         <p className="text-sm text-slate-600 mb-1">Invested Amount</p>
-                        <p className="text-3xl font-bold text-slate-900">
+                        <p className="text-xl font-bold text-slate-900">
                           ₹{result.investedAmount.toLocaleString('en-IN')}
                         </p>
                       </div>
 
                       {/* Total Withdrawal */}
-                      <div className="bg-green-50 p-4 rounded-lg border-l-4 border-green-500">
+                      <div className="bg-green-50 p-3 rounded-lg border-l-4 border-green-500">
                         <p className="text-sm text-slate-600 mb-1">Total Withdrawal</p>
-                        <p className="text-3xl font-bold text-green-600">
+                        <p className="text-xl font-bold text-green-600">
                           ₹{result.totalWithdrawn.toLocaleString('en-IN')}
                         </p>
                       </div>
 
                       {/* Final Value */}
-                      <div className="bg-purple-50 p-4 rounded-lg border-l-4 border-purple-500">
+                      <div className="bg-purple-50 p-3 rounded-lg border-l-4 border-purple-500">
                         <p className="text-sm text-slate-600 mb-1">Final Value</p>
-                        <p className="text-3xl font-bold text-purple-600">
+                        <p className="text-xl font-bold text-purple-600">
                           ₹{result.finalValue.toLocaleString('en-IN')}
                         </p>
                       </div>
 
                       {/* Total Returns */}
-                      <div className={`p-4 rounded-lg border-l-4 ${
+                      <div className={`p-3 rounded-lg border-l-4 ${
                         result.totalReturnsEarned >= 0
                           ? 'bg-green-50 border-green-600'
                           : 'bg-red-50 border-red-600'
                       }`}>
                         <p className="text-sm text-slate-600 mb-1">Total Returns Earned</p>
-                        <p className={`text-3xl font-bold ${
+                        <p className={`text-xl font-bold ${
                           result.totalReturnsEarned >= 0
                             ? 'text-green-600'
                             : 'text-red-600'
@@ -292,9 +292,9 @@ export default function SWPCalculator({ onNavigate }) {
                   </div>
 
                   {/* Summary Card */}
-                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-lg p-6 border-2 border-blue-200">
-                    <h3 className="text-lg font-bold text-slate-900 mb-4">📊 Summary</h3>
-                    <div className="space-y-3 text-sm text-slate-700">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg shadow-lg p-4 border-2 border-blue-200">
+                    <h3 className="text-sm font-bold text-slate-900 mb-2">📏 Summary</h3>
+                    <div className="space-y-2 text-sm text-slate-700">
                       <div className="flex justify-between">
                         <span>Withdrawal Period:</span>
                         <span className="font-semibold">{result.months} months</span>
@@ -321,7 +321,7 @@ export default function SWPCalculator({ onNavigate }) {
               ) : (
                 <div className="bg-white rounded-lg shadow-lg p-8 text-center">
                   <div className="text-6xl mb-4">💼</div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">Adjust Parameters</h3>
+                  <h3 className="text-lg font-bold text-slate-900 mb-2">Adjust Parameters</h3>
                   <p className="text-slate-600">
                     Use the sliders on the left to calculate your SWP returns
                   </p>
@@ -332,7 +332,7 @@ export default function SWPCalculator({ onNavigate }) {
 
           {/* Info Section */}
           <div className="mt-12 bg-white rounded-lg shadow-lg p-6">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">📚 About SWP</h2>
+            <h2 className="text-lg font-bold text-slate-900 mb-4">📚 About SWP</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="border-l-4 border-blue-500 pl-4">
                 <h3 className="font-bold text-slate-900 mb-2">💡 What is SWP?</h3>
@@ -358,8 +358,8 @@ export default function SWPCalculator({ onNavigate }) {
           {/* FAQ Section */}
           <div className="mt-12">
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-slate-900 mb-2">❓ Frequently Asked Questions</h2>
-              <p className="text-lg text-slate-700">
+              <h2 className="text-xl font-bold text-slate-900 mb-2">❓ Frequently Asked Questions</h2>
+              <p className="text-sm text-slate-700">
                 Find answers to common questions about SWP and retirement planning
               </p>
             </div>

@@ -1,27 +1,35 @@
 import React, { useState } from 'react';
 import { goToPartPayment } from '../utils/navigationUtils';
+import logoIcon from '../icon/icon3.png';
 
-export default function Header({ onNavigate, latestEmiData, userEmail }) {
+export default function Header({ onNavigate, latestEmiData, userEmail, onPartPaymentClick, onChangeEmail }) {
   const [openDropdown, setOpenDropdown] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const handlePartPaymentClick = () => {
-    // Use shared navigation function
-    goToPartPayment(onNavigate, latestEmiData);
+    // Call the handler from parent (App) to show email modal
+    if (onPartPaymentClick) {
+      onPartPaymentClick();
+    }
     setOpenDropdown(null);
+    setIsMobileMenuOpen(false);
   };
 
   const handleNavigateAndClose = (page) => {
     onNavigate(page);
     setOpenDropdown(null);
+    setIsMobileMenuOpen(false);
   };
 
   const toggleDropdown = (dropdown) => {
     setOpenDropdown(openDropdown === dropdown ? null : dropdown);
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('userEmail');
-    window.location.reload();
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+    if (openDropdown) {
+      setOpenDropdown(null);
+    }
   };
 
   const calculators = [
@@ -37,49 +45,47 @@ export default function Header({ onNavigate, latestEmiData, userEmail }) {
   ];
 
   return (
-    <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-4 shadow-lg sticky top-0 z-50">
+    <header className="bg-gradient-to-r from-blue-600 to-blue-800 text-white py-2 shadow-lg sticky top-0 z-50">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center">
           {/* Logo/Title */}
-          <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold cursor-pointer hover:text-blue-200 transition" onClick={() => handleNavigateAndClose('home')}>
-              💰 Universal
-            </h1>
-          </div>
-
-          {/* Center - Email Display */}
-          <div className="hidden md:flex items-center gap-4">
-            {userEmail ? (
-              <div className="flex items-center gap-2 bg-blue-500 bg-opacity-50 px-4 py-2 rounded-lg border border-blue-300">
-                <span className="text-sm">📧 Email:</span>
-                <span className="font-semibold text-white">{userEmail}</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 px-4 py-2 text-blue-200 text-sm">
-                <span>📧</span>
-                <span>Loading...</span>
-              </div>
-            )}
-            <button
-              onClick={handleLogout}
-              className="text-xs bg-red-500 hover:bg-red-600 px-3 py-1 rounded-lg transition duration-200 font-medium"
-              title="Logout and change email"
-            >
-              🔄 Change
-            </button>
+          <div className="flex items-center gap-2 bg-gradient-to-r from-blue-700 to-blue-900 px-3 py-1 rounded">
+            <img src={logoIcon} alt="Universal Calculator Logo" className="w-12 h-12" />
+            <div className="flex flex-col">
+              <h4 className="text-xs font-bold cursor-pointer hover:text-blue-200 transition leading-tight" onClick={() => handleNavigateAndClose('home')}>
+                Universal
+              </h4>
+              <p className="text-xs font-semibold cursor-pointer hover:text-blue-200 transition leading-tight" onClick={() => handleNavigateAndClose('home')}>
+                Calculators & Convertors
+              </p>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-2">
+          <nav className="hidden md:flex items-center gap-2 flex-shrink-0">
+            {/* Email Display */}
+            {userEmail && (
+              <div className="flex items-center gap-2 bg-blue-500 bg-opacity-50 px-3 py-1 rounded border border-blue-300 text-xs">
+                <span>📧 Email:</span>
+                <span className="font-semibold text-white">{userEmail}</span>
+                <button
+                  onClick={() => onChangeEmail && onChangeEmail()}
+                  className="ml-1 px-2 py-0.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded transition duration-200"
+                >
+                  Change
+                </button>
+              </div>
+            )}
+
             {/* Calculators Dropdown */}
             <div className="relative group">
               <button
-                className="hover:text-blue-200 transition font-medium py-2 px-4 rounded-lg hover:bg-blue-500 hover:bg-opacity-30"
+                className="hover:text-blue-200 transition font-bold py-1 px-2.5 rounded text-sm hover:bg-blue-500 hover:bg-opacity-30 whitespace-nowrap"
               >
                 🧮 Calculators
-                <span className="ml-1 text-xs">▼</span>
+                <span className="ml-0.5 text-sm">▼</span>
               </button>
-              <div className="absolute left-0 mt-0 w-56 bg-white text-slate-900 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
+              <div className="absolute left-0 mt-0 w-44 bg-white text-slate-900 rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-0.5 z-50">
                 {calculators.map((calc, index) => (
                   <button
                     key={index}
@@ -94,7 +100,7 @@ export default function Header({ onNavigate, latestEmiData, userEmail }) {
                         handleNavigateAndClose(calc.page);
                       }
                     }}
-                    className="w-full text-left px-4 py-2 hover:bg-blue-100 transition duration-150 flex items-center gap-2"
+                    className="w-full text-left px-2.5 py-1 hover:bg-blue-100 transition duration-150 flex items-center gap-1.5 text-xs"
                   >
                     <span>{calc.icon}</span>
                     <span>{calc.label}</span>
@@ -106,17 +112,17 @@ export default function Header({ onNavigate, latestEmiData, userEmail }) {
             {/* Unit Converters Dropdown */}
             <div className="relative group">
               <button
-                className="hover:text-blue-200 transition font-medium py-2 px-4 rounded-lg hover:bg-blue-500 hover:bg-opacity-30"
+                className="hover:text-blue-200 transition font-bold py-1 px-2.5 rounded text-sm hover:bg-blue-500 hover:bg-opacity-30 whitespace-nowrap"
               >
                 🔄 Unit Converters
-                <span className="ml-1 text-xs">▼</span>
+                <span className="ml-0.5 text-sm">▼</span>
               </button>
-              <div className="absolute left-0 mt-0 w-56 bg-white text-slate-900 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-2 z-50">
+              <div className="absolute left-0 mt-0 w-44 bg-white text-slate-900 rounded shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 py-0.5 z-50">
                 {converters.map((converter, index) => (
                   <button
                     key={index}
                     onClick={() => handleNavigateAndClose(converter.page)}
-                    className="w-full text-left px-4 py-2 hover:bg-blue-100 transition duration-150 flex items-center gap-2"
+                    className="w-full text-left px-2.5 py-1 hover:bg-blue-100 transition duration-150 flex items-center gap-1.5 text-xs"
                   >
                     <span>{converter.icon}</span>
                     <span>{converter.label}</span>
@@ -128,7 +134,7 @@ export default function Header({ onNavigate, latestEmiData, userEmail }) {
             {/* Help Link */}
             <button
               onClick={() => handleNavigateAndClose('help')}
-              className="hover:text-blue-200 transition font-medium py-2 px-4 rounded-lg hover:bg-blue-500 hover:bg-opacity-30"
+              className="hover:text-blue-200 transition font-bold py-1 px-2.5 rounded text-sm hover:bg-blue-500 hover:bg-opacity-30 whitespace-nowrap"
             >
               ❓ Help
             </button>
@@ -136,27 +142,51 @@ export default function Header({ onNavigate, latestEmiData, userEmail }) {
 
           {/* Mobile Menu Button */}
           <button 
-            onClick={() => toggleDropdown('mobile')}
-            className="md:hidden text-white font-bold text-xl bg-blue-500 hover:bg-blue-600 p-2 rounded-lg transition duration-200"
+            onClick={toggleMobileMenu}
+            className="md:hidden text-white font-semibold text-sm bg-blue-500 hover:bg-blue-600 p-2 rounded-lg transition duration-200"
           >
             ☰
           </button>
         </div>
+      </div>
 
-        {/* Mobile Navigation Menu */}
-        {openDropdown === 'mobile' && (
-          <div className="md:hidden mt-4 bg-blue-700 rounded-lg overflow-hidden">
-            {/* Mobile Calculators Section */}
+      {/* Mobile Vertical Navigation Sidebar */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden fixed left-0 top-20 bottom-0 w-64 bg-gradient-to-b from-blue-700 to-blue-800 shadow-lg overflow-y-auto z-40">
+          {/* Mobile Email Display */}
+          <div className="p-2 border-b border-blue-600">
+            {userEmail ? (
+              <div className="flex items-center justify-between gap-2 bg-blue-600 px-2 py-1 rounded border border-blue-400 text-xs mb-1">
+                <div className="flex items-center gap-1">
+                  <span>📧</span>
+                  <span className="font-semibold truncate">{userEmail}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    onChangeEmail && onChangeEmail();
+                    setIsMobileMenuOpen(false);
+                  }}
+                  className="px-2 py-0.5 bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold rounded transition duration-200 whitespace-nowrap"
+                >
+                  Change
+                </button>
+              </div>
+            ) : null}
+          </div>
+
+          {/* Mobile Navigation Items */}
+          <nav className="p-2 space-y-1">
+            {/* Calculators Section */}
             <div>
               <button
                 onClick={() => toggleDropdown('mobile-calc')}
-                className="w-full text-left px-4 py-3 hover:bg-blue-600 transition duration-150 font-medium flex items-center justify-between border-b border-blue-600"
+                className="w-full text-left px-3 py-2 hover:bg-blue-600 rounded transition duration-150 font-medium flex items-center justify-between bg-blue-600 mb-0.5"
               >
                 <span>🧮 Calculators</span>
                 <span className={`text-xs transition-transform ${openDropdown === 'mobile-calc' ? 'rotate-180' : ''}`}>▼</span>
               </button>
               {openDropdown === 'mobile-calc' && (
-                <div className="bg-blue-600 py-2">
+                <div className="space-y-0.5 mb-2">
                   {calculators.map((calc, index) => (
                     <button
                       key={index}
@@ -171,7 +201,7 @@ export default function Header({ onNavigate, latestEmiData, userEmail }) {
                           handleNavigateAndClose(calc.page);
                         }
                       }}
-                      className="w-full text-left px-6 py-2 hover:bg-blue-500 transition duration-150 flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 hover:bg-blue-500 rounded transition duration-150 flex items-center gap-2 text-sm"
                     >
                       <span>{calc.icon}</span>
                       <span>{calc.label}</span>
@@ -181,22 +211,22 @@ export default function Header({ onNavigate, latestEmiData, userEmail }) {
               )}
             </div>
 
-            {/* Mobile Converters Section */}
+            {/* Converters Section */}
             <div>
               <button
                 onClick={() => toggleDropdown('mobile-conv')}
-                className="w-full text-left px-4 py-3 hover:bg-blue-600 transition duration-150 font-medium flex items-center justify-between border-b border-blue-600"
+                className="w-full text-left px-3 py-2 hover:bg-blue-600 rounded transition duration-150 font-medium flex items-center justify-between bg-blue-600 mb-0.5"
               >
                 <span>🔄 Unit Converters</span>
                 <span className={`text-xs transition-transform ${openDropdown === 'mobile-conv' ? 'rotate-180' : ''}`}>▼</span>
               </button>
               {openDropdown === 'mobile-conv' && (
-                <div className="bg-blue-600 py-2">
+                <div className="space-y-0.5 mb-2">
                   {converters.map((converter, index) => (
                     <button
                       key={index}
                       onClick={() => handleNavigateAndClose(converter.page)}
-                      className="w-full text-left px-6 py-2 hover:bg-blue-500 transition duration-150 flex items-center gap-2"
+                      className="w-full text-left px-3 py-1.5 hover:bg-blue-500 rounded transition duration-150 flex items-center gap-2 text-sm"
                     >
                       <span>{converter.icon}</span>
                       <span>{converter.label}</span>
@@ -206,38 +236,25 @@ export default function Header({ onNavigate, latestEmiData, userEmail }) {
               )}
             </div>
 
-            {/* Mobile Help Link */}
+            {/* Help Link */}
             <button
               onClick={() => handleNavigateAndClose('help')}
-              className="w-full text-left px-4 py-3 hover:bg-blue-600 transition duration-150 font-medium flex items-center gap-2"
+              className="w-full text-left px-3 py-2 hover:bg-blue-600 rounded transition duration-150 font-medium flex items-center gap-2 bg-blue-600"
             >
               <span>❓</span>
               <span>Help</span>
             </button>
-          </div>
-        )}
-
-        {/* Mobile Email Display */}
-        <div className="md:hidden mt-3 flex items-center justify-between">
-          {userEmail ? (
-            <div className="flex items-center gap-2 bg-blue-500 bg-opacity-50 px-3 py-1 rounded border border-blue-300 text-sm flex-1">
-              <span>📧</span>
-              <span className="font-semibold truncate">{userEmail}</span>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 text-blue-200 text-sm">
-              <span>📧</span>
-              <span>Loading...</span>
-            </div>
-          )}
-          <button
-            onClick={handleLogout}
-            className="text-xs bg-red-500 hover:bg-red-600 px-2 py-1 rounded ml-2 transition duration-200 font-medium"
-          >
-            🔄
-          </button>
+          </nav>
         </div>
-      </div>
+      )}
+
+      {/* Overlay for mobile menu */}
+      {isMobileMenuOpen && (
+        <div 
+          className="md:hidden fixed inset-0 bg-black bg-opacity-30 z-30 top-20"
+          onClick={() => setIsMobileMenuOpen(false)}
+        ></div>
+      )}
     </header>
   );
 }
