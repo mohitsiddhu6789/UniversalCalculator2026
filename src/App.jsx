@@ -29,13 +29,13 @@ export default function App() {
     const storedEmail = sessionStorage.getItem('userEmail');
     if (storedEmail) {
       setUserEmail(storedEmail);
+    }
 
-      // Check URL for target page
-      const urlParams = new URLSearchParams(window.location.search);
-      const page = urlParams.get('page');
-      if (page && ['home', 'part-payment', 'swp', 'scientific', 'units', 'temperature', 'admin', 'help'].includes(page)) {
-        setCurrentPage(page);
-      }
+    // Check URL for target page
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page');
+    if (page && ['home', 'part-payment', 'swp', 'scientific', 'units', 'temperature', 'admin', 'help'].includes(page)) {
+      setCurrentPage(page);
     }
 
     // Detect if running in Capacitor mobile app
