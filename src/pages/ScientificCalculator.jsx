@@ -90,7 +90,7 @@ export default function ScientificCalculator({ onNavigate }) {
   const [operation, setOperation] = useState(null);
   const [angle, setAngle] = useState('RAD');
   const [expandedFaqIndex, setExpandedFaqIndex] = useState(null);
-
+  const [showScientific, setShowScientific] = useState(true);
   const handleNumber = (num) => {
     if (display === '0') {
       setDisplay(String(num));
@@ -258,28 +258,56 @@ export default function ScientificCalculator({ onNavigate }) {
               </div>
             </div>
 
-            {/* Angle Toggle */}
+            {/* Mode Toggle */}
+            <div className="flex gap-2 mb-4">
+              <button
+                onClick={() => setShowScientific(false)}
+                className={`px-4 py-2 rounded-lg font-bold transition duration-200 text-sm ${
+                  !showScientific
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-200 text-slate-900 hover:bg-slate-300'
+                }`}
+              >
+                Basic
+              </button>
+              <button
+                onClick={() => setShowScientific(true)}
+                className={`px-4 py-2 rounded-lg font-bold transition duration-200 text-sm ${
+                  showScientific
+                    ? 'bg-blue-600 text-white'
+                    : 'bg-slate-200 text-slate-900 hover:bg-slate-300'
+                }`}
+              >
+                Scientific
+              </button>
+            </div>
+
+            {/* Angle Toggle & Clear */}
             <div className="flex gap-1.5 mb-2">
-              <button
-                onClick={toggleAngle}
-                className={`px-3 py-1 rounded-lg font-bold transition duration-200 text-sm ${
-                  angle === 'RAD'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-200 text-slate-900'
-                }`}
-              >
-                RAD
-              </button>
-              <button
-                onClick={toggleAngle}
-                className={`px-3 py-1 rounded-lg font-bold transition duration-200 text-sm ${
-                  angle === 'DEG'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-slate-200 text-slate-900'
-                }`}
-              >
-                DEG
-              </button>
+              {showScientific && (
+                <>
+                  <button
+                    onClick={toggleAngle}
+                    className={`px-3 py-1 rounded-lg font-bold transition duration-200 text-sm ${
+                      angle === 'RAD'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-200 text-slate-900'
+                    }`}
+                  >
+                    RAD
+                  </button>
+                  <button
+                    onClick={toggleAngle}
+                    className={`px-3 py-1 rounded-lg font-bold transition duration-200 text-sm ${
+                      angle === 'DEG'
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-slate-200 text-slate-900'
+                    }`}
+                  >
+                    DEG
+                  </button>
+                </>
+              )}
               <button
                 onClick={handleClear}
                 className="ml-auto px-4 py-1 bg-red-500 hover:bg-red-600 text-white rounded-lg font-bold transition duration-200 text-sm"
@@ -295,209 +323,356 @@ export default function ScientificCalculator({ onNavigate }) {
             </div>
 
             {/* Calculator Grid */}
-            <div className="grid grid-cols-5 gap-1.5">
-              {/* Scientific Functions Row 1 */}
-              <button
-                onClick={() => handleScientific('x²')}
-                className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                x²
-              </button>
-              <button
-                onClick={() => handleScientific('cbrt')}
-                className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                ∛
-              </button>
-              <button
-                onClick={() => handleScientific('1/x')}
-                className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                1/x
-              </button>
-              <button
-                onClick={toggleAngle}
-                className="bg-slate-300 hover:bg-slate-400 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                {angle === 'RAD' ? 'RAD' : 'DEG'}
-              </button>
-              <button
-                onClick={() => handleScientific('log')}
-                className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                log
-              </button>
+            <div className={`grid ${showScientific ? 'grid-cols-4' : 'grid-cols-3'} gap-1.5`}>
+              {/* Scientific Functions Rows - Only show in scientific mode */}
+              {showScientific && (
+                <>
+                  {/* Scientific Functions Row 1 */}
+                  <button
+                    onClick={() => handleScientific('x²')}
+                    className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    x²
+                  </button>
+                  <button
+                    onClick={() => handleScientific('sqrt')}
+                    className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    √
+                  </button>
+                  <button
+                    onClick={() => handleScientific('x³')}
+                    className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    x³
+                  </button>
+                  <button
+                    onClick={() => handleScientific('cbrt')}
+                    className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    ∛
+                  </button>
 
-              {/* Scientific Functions Row 2 */}
-              <button
-                onClick={() => handleScientific('sqrt')}
-                className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                √
-              </button>
-              <button
-                onClick={() => handleScientific('x³')}
-                className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                x³
-              </button>
-              <button
-                onClick={() => handleScientific('π')}
-                className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                π
-              </button>
-              <button
-                onClick={() => handleNumber('7')}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                7
-              </button>
-              <button
-                onClick={() => handleNumber('8')}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                8
-              </button>
+                  {/* Scientific Functions Row 2 */}
+                  <button
+                    onClick={() => handleScientific('sin')}
+                    className="bg-orange-100 hover:bg-orange-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    sin
+                  </button>
+                  <button
+                    onClick={() => handleScientific('cos')}
+                    className="bg-orange-100 hover:bg-orange-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    cos
+                  </button>
+                  <button
+                    onClick={() => handleScientific('tan')}
+                    className="bg-orange-100 hover:bg-orange-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    tan
+                  </button>
+                  <button
+                    onClick={() => handleScientific('1/x')}
+                    className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    1/x
+                  </button>
 
-              {/* Trigonometric Functions */}
-              <button
-                onClick={() => handleScientific('sin')}
-                className="bg-orange-100 hover:bg-orange-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                sin
-              </button>
-              <button
-                onClick={() => handleScientific('cos')}
-                className="bg-orange-100 hover:bg-orange-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                cos
-              </button>
-              <button
-                onClick={() => handleScientific('tan')}
-                className="bg-orange-100 hover:bg-orange-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                tan
-              </button>
-              <button
-                onClick={() => handleNumber('4')}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                4
-              </button>
-              <button
-                onClick={() => handleNumber('5')}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                5
-              </button>
+                  {/* Scientific Functions Row 3 */}
+                  <button
+                    onClick={() => handleScientific('log')}
+                    className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    log
+                  </button>
+                  <button
+                    onClick={() => handleScientific('ln')}
+                    className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    ln
+                  </button>
+                  <button
+                    onClick={() => handleScientific('π')}
+                    className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    π
+                  </button>
+                  <button
+                    onClick={() => handleScientific('e')}
+                    className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    e
+                  </button>
 
-              {/* Basic Operations */}
-              <button
-                onClick={() => handleScientific('(')}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                (
-              </button>
-              <button
-                onClick={() => handleScientific(')')}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                )
-              </button>
-              <button
-                onClick={() => handleScientific('e')}
-                className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                e
-              </button>
-              <button
-                onClick={() => handleNumber('1')}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                1
-              </button>
-              <button
-                onClick={() => handleNumber('2')}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                2
-              </button>
+                  {/* Row 4 - Parentheses & Angle Toggle */}
+                  <button
+                    onClick={() => handleScientific('(')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    (
+                  </button>
+                  <button
+                    onClick={() => handleScientific(')')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    )
+                  </button>
+                  <button
+                    onClick={() => handleScientific('%')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    %
+                  </button>
+                  <button
+                    onClick={toggleAngle}
+                    className="bg-slate-300 hover:bg-slate-400 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    {angle === 'RAD' ? 'RAD' : 'DEG'}
+                  </button>
+                </>
+              )}
 
-              {/* Basic Operations Row */}
-              <button
-                onClick={() => handleOperation('÷')}
-                className="bg-green-100 hover:bg-green-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                ÷
-              </button>
-              <button
-                onClick={() => handleOperation('^')}
-                className="bg-blue-100 hover:bg-blue-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                ^
-              </button>
-              <button
-                onClick={() => handleScientific('%')}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                %
-              </button>
-              <button
-                onClick={() => handleNumber('3')}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                3
-              </button>
-              <button
-                onClick={() => handleOperation('×')}
-                className="bg-green-100 hover:bg-green-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                ×
-              </button>
+              {/* Basic Mode Layout */}
+              {!showScientific ? (
+                <>
+                  {/* Numbers: 1, 2, 3 */}
+                  <button
+                    onClick={() => handleNumber('1')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    1
+                  </button>
+                  <button
+                    onClick={() => handleNumber('2')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    2
+                  </button>
+                  <button
+                    onClick={() => handleNumber('3')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    3
+                  </button>
 
-              {/* Bottom Row */}
-              <button
-                onClick={() => handleNumber('0')}
-                className="col-span-2 bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                0
-              </button>
-              <button
-                onClick={handleDecimal}
-                className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                .
-              </button>
-              <button
-                onClick={() => handleScientific('ln')}
-                className="bg-purple-100 hover:bg-purple-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                ln
-              </button>
-              <button
-                onClick={() => handleOperation('-')}
-                className="bg-green-100 hover:bg-green-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-              >
-                −
-              </button>
+                  {/* Numbers: 4, 5, 6 */}
+                  <button
+                    onClick={() => handleNumber('4')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    4
+                  </button>
+                  <button
+                    onClick={() => handleNumber('5')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    5
+                  </button>
+                  <button
+                    onClick={() => handleNumber('6')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    6
+                  </button>
+
+                  {/* Numbers: 7, 8, 9 */}
+                  <button
+                    onClick={() => handleNumber('7')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    7
+                  </button>
+                  <button
+                    onClick={() => handleNumber('8')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    8
+                  </button>
+                  <button
+                    onClick={() => handleNumber('9')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    9
+                  </button>
+
+                  {/* Numbers: 0 and Decimal */}
+                  <button
+                    onClick={() => handleNumber('0')}
+                    className="col-span-2 bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    0
+                  </button>
+                  <button
+                    onClick={handleDecimal}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    .
+                  </button>
+
+                  {/* Operators Row: +, -, ×, ÷ */}
+                  <button
+                    onClick={() => handleOperation('+')}
+                    className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    +
+                  </button>
+                  <button
+                    onClick={() => handleOperation('-')}
+                    className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    −
+                  </button>
+                  <button
+                    onClick={() => handleOperation('×')}
+                    className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    ×
+                  </button>
+                  <button
+                    onClick={() => handleOperation('÷')}
+                    className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    ÷
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Scientific Mode Layout */}
+                  {/* Numbers: 7, 8, 9, ÷ */}
+                  <button
+                    onClick={() => handleNumber('7')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    7
+                  </button>
+                  <button
+                    onClick={() => handleNumber('8')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    8
+                  </button>
+                  <button
+                    onClick={() => handleNumber('9')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    9
+                  </button>
+                  <button
+                    onClick={() => handleOperation('÷')}
+                    className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    ÷
+                  </button>
+
+                  {/* Numbers: 4, 5, 6, × */}
+                  <button
+                    onClick={() => handleNumber('4')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    4
+                  </button>
+                  <button
+                    onClick={() => handleNumber('5')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    5
+                  </button>
+                  <button
+                    onClick={() => handleNumber('6')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    6
+                  </button>
+                  <button
+                    onClick={() => handleOperation('×')}
+                    className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    ×
+                  </button>
+
+                  {/* Numbers: 1, 2, 3, - */}
+                  <button
+                    onClick={() => handleNumber('1')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    1
+                  </button>
+                  <button
+                    onClick={() => handleNumber('2')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    2
+                  </button>
+                  <button
+                    onClick={() => handleNumber('3')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    3
+                  </button>
+                  <button
+                    onClick={() => handleOperation('-')}
+                    className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    −
+                  </button>
+
+                  {/* Numbers: 0, Decimal, ^, + */}
+                  <button
+                    onClick={() => handleNumber('0')}
+                    className="col-span-2 bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    0
+                  </button>
+                  <button
+                    onClick={handleDecimal}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    .
+                  </button>
+                  <button
+                    onClick={() => handleOperation('+')}
+                    className="bg-green-500 hover:bg-green-600 text-white p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    +
+                  </button>
+
+                  {/* Last Row: Power, Backspace, Clear */}
+                  <button
+                    onClick={() => handleOperation('^')}
+                    className="bg-blue-100 hover:bg-blue-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    ^
+                  </button>
+                  <button
+                    onClick={() => handleScientific('±')}
+                    className="bg-slate-200 hover:bg-slate-300 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    ±
+                  </button>
+                  <button
+                    onClick={handleBackspace}
+                    className="bg-red-100 hover:bg-red-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    ⌫
+                  </button>
+                  <button
+                    onClick={handleClear}
+                    className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg font-bold transition duration-200"
+                  >
+                    C
+                  </button>
+                </>
+              )}
 
               {/* Equals Button */}
               <button
                 onClick={handleEquals}
-                className="col-span-5 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg font-bold text-sm transition duration-200"
+                className={`${showScientific ? 'col-span-4' : 'col-span-3'} bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-lg font-bold text-sm transition duration-200`}
               >
                 ↵
               </button>
             </div>
-
-            {/* Add Button */}
-            <button
-              onClick={() => handleOperation('+')}
-              className="w-full mt-2 bg-green-100 hover:bg-green-200 text-slate-900 p-2 rounded-lg font-bold transition duration-200"
-            >
-              +
-            </button>
           </div>
 
           {/* Info Section */}

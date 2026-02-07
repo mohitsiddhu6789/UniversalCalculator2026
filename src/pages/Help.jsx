@@ -511,15 +511,28 @@ export default function Help({ onNavigate }) {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <div>
                 <h4 className="font-bold text-slate-900 text-sm mb-2">📧 Email</h4>
-                <p className="text-slate-600 text-xs">support@universal.com</p>
+                <p className="text-slate-600 text-xs">
+                  <a href="mailto:mohitsiddhu6789@gmail.com" className="hover:text-blue-600 underline">
+                    mohitsiddhu6789@gmail.com
+                  </a>
+                </p>
               </div>
               <div>
                 <h4 className="font-bold text-slate-900 text-sm mb-2">💬 Chat</h4>
                 <p className="text-slate-600 text-xs">Live chat available 24/7</p>
               </div>
               <div>
-                <h4 className="font-bold text-slate-900 text-sm mb-2">📱 Phone</h4>
-                <p className="text-slate-600 text-xs">+91 XXXX XXX XXX</p>
+                <h4 className="font-bold text-slate-900 text-sm mb-2">📱 WhatsApp</h4>
+                <p className="text-slate-600 text-xs">
+                  <a 
+                    href="https://wa.me/919718227038" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="hover:text-green-600 underline inline-flex items-center gap-1"
+                  >
+                    +91 9718227038 💬
+                  </a>
+                </p>
               </div>
             </div>
             <p className="text-sm text-slate-600 mt-4">Version 1.0 | Universal Calculators & Converters © 2024</p>
